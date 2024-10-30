@@ -1,6 +1,6 @@
 {
-	"name": "create-r2-sunpay-invoice",
-	"version": "0.0.1",
+	"name": "r2_sunpay_invoice",
+	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
 		"bootstrap": "yarn && composer install --no-interaction",
