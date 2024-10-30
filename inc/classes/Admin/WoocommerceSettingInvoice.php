@@ -27,7 +27,7 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 	 */
 	public function __construct() {
 		$this->id    = 'woomp_setting_invoice';
-		$this->label = __( '電子發票設定', 'woomp' );
+		$this->label = __( '電子發票設定', 'r2-sunpay-invoice' );
 		add_filter( 'woocommerce_settings_tabs_array', [ $this, 'add_settings_tab' ], 51 );
 		add_action( 'woocommerce_sections_' . $this->id, [ $this, 'output_sections' ] );
 		add_action( 'woocommerce_settings_' . $this->id, [ $this, 'output' ] );
@@ -41,7 +41,7 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 	 * @return array<mixed> $settings_tabs Array of WooCommerce setting tabs & their labels, including the Subscription tab.
 	 */
 	public function add_settings_tab( $settings_tabs ) {
-		$settings_tabs['woomp_setting_invoice'] = __( '電子發票設定', 'woomp' );
+		$settings_tabs['woomp_setting_invoice'] = __( '電子發票設定', 'r2-sunpay-invoice' );
 		return $settings_tabs;
 	}
 
@@ -90,14 +90,14 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 						'title'   => '除錯資訊',
 						'type'    => 'checkbox',
 						'default' => 'no',
-						'desc'    => sprintf( '紀錄日誌於以下路徑：<code>%s</code>', wc_get_log_file_path( 'woomp-sunpay-invoice' ) ),
+						'desc'    => sprintf( '紀錄日誌於以下路徑：<code>%s</code>', wc_get_log_file_path( 'r2-sunpay-invoice-sunpay-invoice' ) ),
 						'id'      => 'wc_woomp_sunpay_invoice_debug_log_enabled',
 					],
 					[
-						'title'    => __( 'Order number prefix', 'woomp' ),
+						'title'    => __( 'Order number prefix', 'r2-sunpay-invoice' ),
 						'id'       => 'wc_woomp_sunpay_invoice_order_prefix',
 						'type'     => 'text',
-						'desc'     => __( 'The prefix string of order number. Only letters and numbers allowed.', 'woomp' ),
+						'desc'     => __( 'The prefix string of order number. Only letters and numbers allowed.', 'r2-sunpay-invoice' ),
 						'desc_tip' => true,
 					],
 
@@ -106,25 +106,25 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 						'id'   => 'wc_woomp_general_setting',
 					],
 					[
-						'title' => __( 'Invoice options', 'woomp' ),
+						'title' => __( 'Invoice options', 'r2-sunpay-invoice' ),
 						'id'    => 'invoice_options',
 						'type'  => 'title',
 					],
 					[
-						'name'     => __( 'Issue Mode', 'paynow-einvoice' ),
+						'name'     => __( 'Issue Mode', 'r2-sunpay-invoice' ),
 						'type'     => 'select',
 						'desc'     => __( 'You can issue the e-invoice manually even if you choose Automatic mode' ),
 						'class'    => 'wc-enhanced-select',
 						'desc_tip' => true,
 						'id'       => 'wc_woomp_sunpay_invoice_issue_mode',
 						'options'  => [
-							'manual' => __( 'Issue Manual', 'woomp' ),
-							'auto'   => __( 'Issue automatic', 'woomp' ),
+							'manual' => __( 'Issue Manual', 'r2-sunpay-invoice' ),
+							'auto'   => __( 'Issue automatic', 'r2-sunpay-invoice' ),
 						],
 						'default'  => 'manual',
 					],
 					[
-						'name'     => __( 'Allowed Order Status for issue', 'woomp' ),
+						'name'     => __( 'Allowed Order Status for issue', 'r2-sunpay-invoice' ),
 						'type'     => 'select',
 						'class'    => 'wc-enhanced-select',
 						'desc'     => __( 'When order status changes to the status, the e-invoice will be issued automatically.' ),
@@ -133,20 +133,20 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 						'options'  => wc_get_order_statuses(),
 					],
 					[
-						'name'     => __( 'Invalid mode', 'woomp' ),
+						'name'     => __( 'Invalid mode', 'r2-sunpay-invoice' ),
 						'type'     => 'select',
 						'desc'     => __( 'You can issue the e-invoice manually even if you choose Automatic mode' ),
 						'class'    => 'wc-enhanced-select',
 						'desc_tip' => true,
 						'id'       => 'wc_woomp_sunpay_invoice_invalid_mode',
 						'options'  => [
-							'manual' => __( 'Invalid manual', 'woomp' ),
-							'auto'   => __( 'Invalid automatic', 'woomp' ),
+							'manual' => __( 'Invalid manual', 'r2-sunpay-invoice' ),
+							'auto'   => __( 'Invalid automatic', 'r2-sunpay-invoice' ),
 						],
 						'default'  => 'auto',
 					],
 					[
-						'name'     => __( 'Allowed Order Status for invalid', 'woomp' ),
+						'name'     => __( 'Allowed Order Status for invalid', 'r2-sunpay-invoice' ),
 						'type'     => 'select',
 						'class'    => 'wc-enhanced-select',
 						'desc'     => __( 'When order status changes to the status, the e-invoice will be invalid automatically.' ),
@@ -158,21 +158,21 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 						],
 					],
 					[
-						'name'    => __( 'Carrier Type', 'paynow-einvoice' ),
-						'desc'    => __( 'Allowed invoice carrier type', 'woomp' ),
+						'name'    => __( 'Carrier Type', 'r2-sunpay-invoice' ),
+						'desc'    => __( 'Allowed invoice carrier type', 'r2-sunpay-invoice' ),
 						'id'      => 'wc_woomp_sunpay_invoice_carrier_type',
 						'class'   => 'wc-enhanced-select',
 						'type'    => 'multiselect',
 						'options' => [
-							__( 'Cloud Invoice', 'woomp' ) => __( 'Cloud Invoice', 'woomp' ),
-							__( 'Mobile Code', 'paynow-einvoice' ) => __( 'Mobile Code', 'paynow-einvoice' ),
-							__( 'Citizen Digital Certificate', 'paynow-einvoice' ) => __( 'Citizen Digital Certificate', 'paynow-einvoice' ),
-							__( 'Paper Invoice', 'woomp' ) => __( 'Paper Invoice', 'woomp' ),
+							__( 'Cloud Invoice', 'r2-sunpay-invoice' ) => __( 'Cloud Invoice', 'r2-sunpay-invoice' ),
+							__( 'Mobile Code', 'r2-sunpay-invoice' ) => __( 'Mobile Code', 'r2-sunpay-invoice' ),
+							__( 'Citizen Digital Certificate', 'r2-sunpay-invoice' ) => __( 'Citizen Digital Certificate', 'r2-sunpay-invoice' ),
+							__( 'Paper Invoice', 'r2-sunpay-invoice' ) => __( 'Paper Invoice', 'r2-sunpay-invoice' ),
 						],
 					],
 
 					[
-						'name'        => __( 'Donated Organization', 'paynow-einvoice' ),
+						'name'        => __( 'Donated Organization', 'r2-sunpay-invoice' ),
 						'type'        => 'textarea',
 						'desc'        => '輸入捐增機構(每行一筆)，格式為：愛心碼|社福團體名稱，預設為伊甸社會福利基金會',
 						'desc_tip'    => true,

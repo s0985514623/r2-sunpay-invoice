@@ -36,7 +36,7 @@ final class OrderButton {
 		$add_index = array_search( 'shipping_address', array_keys( $columns ) ) + 1;
 		$pre_array = array_splice( $columns, 0, $add_index );
 		$array     = [
-			'wmp_invoice_no' => __( 'Invoice number', 'woomp' ),
+			'wmp_invoice_no' => __( 'Invoice number', 'r2-sunpay-invoice' ),
 		];
 		return array_merge( $pre_array, $array, $columns );
 	}
@@ -62,7 +62,7 @@ final class OrderButton {
 			printf(
 				/*html*/'<br><button type="button" class="button btnInvalidInvoice" value="%1$s">%2$s</button>',
 				\esc_attr( $post_id ),
-				\__( 'Invalid invoice', 'woomp' )
+				\__( 'Invalid invoice', 'r2-sunpay-invoice' )
 			);
 		} else {
 			printf(
@@ -71,7 +71,7 @@ final class OrderButton {
 				\esc_attr( $invoice_type ),
 				\esc_attr( $invoice_tax_id ),
 				\esc_attr( $invoice_company_name ),
-				\__( 'Generate invoice', 'woomp' )
+				\__( 'Generate invoice', 'r2-sunpay-invoice' )
 			);
 		}
 	}
@@ -83,7 +83,7 @@ final class OrderButton {
 	public function add_metabox(): void {
 		\add_meta_box(
 			'sunpay_invoice_meta_box',
-			__( '紅陽電子發票', 'woomp' ),
+			__( '紅陽電子發票', 'r2-sunpay-invoice' ),
 			[ $this, 'invoice_meta_box' ],
 			'shop_order',
 			'side',
@@ -120,12 +120,12 @@ final class OrderButton {
 			$order->save();
 		}
 
-		$_invoice_type = ( array_key_exists( '_invoice_type', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_type'] : '';
-		// $_invoice_individual   = ( array_key_exists( '_invoice_individual', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_individual'] : '';
+		$_invoice_type         = ( array_key_exists( '_invoice_type', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_type'] : '';
+		$_invoice_individual   = ( array_key_exists( '_invoice_individual', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_individual'] : '';
 		$_invoice_carrier      = ( array_key_exists( '_invoice_carrier', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_carrier'] : '';
 		$_invoice_company_name = ( array_key_exists( '_invoice_company_name', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_company_name'] : '';
 		$_invoice_tax_id       = ( array_key_exists( '_invoice_tax_id', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_tax_id'] : '';
-		// $_invoice_donate       = ( array_key_exists( '_invoice_donate', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_donate'] : '';
+		$_invoice_donate       = ( array_key_exists( '_invoice_donate', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_donate'] : '';
 
 		\printf(
 			/*html*/'<p><strong>%1$s</strong></p>
@@ -140,21 +140,25 @@ final class OrderButton {
 			<p><input type="text" name="_invoice_company_name" value="%11$s" style="margin-top:-10px;width:100%%" /><p></div>
 			<div id="invoiceTaxId" style="display:none"><p><strong>%12$s</strong></p>
 			<p><input type="text" name="_invoice_tax_id" value="%13$s" style="margin-top:-10px;width:100%%" /><p></div>
-			%14$s
+			<div id="invoiceDonate" style="display:none"><p><strong>%14$s</strong></p>
+			<p><input type="text" name="_invoice_donate" value="%15$s" style="margin-top:-10px;width:100%%" /><p></div>
+			%16$s
 			',
-			__( 'Invoice Type', 'woomp' ),
-			__( 'individual', 'woomp' ),
-			__( 'company', 'woomp' ),
-			__( 'donate', 'woomp' ),
+			__( 'Invoice Type', 'r2-sunpay-invoice' ),
+			__( 'individual', 'r2-sunpay-invoice' ),
+			__( 'company', 'r2-sunpay-invoice' ),
+			__( 'donate', 'r2-sunpay-invoice' ),
 			selected( $_invoice_type, 'individual', false ),
 			selected( $_invoice_type, 'company', false ),
 			selected( $_invoice_type, 'donate', false ),
-			__( 'Carrier Number', 'woomp' ),
+			__( 'Carrier Number', 'r2-sunpay-invoice' ),
 			$_invoice_carrier ?? '',
-			__( 'Company Name', 'woomp' ),
+			__( 'Company Name', 'r2-sunpay-invoice' ),
 			$_invoice_company_name ?? '',
-			__( 'TaxID', 'woomp' ),
+			__( 'TaxID', 'r2-sunpay-invoice' ),
 			$_invoice_tax_id,
+			__( 'Donate Number', 'r2-sunpay-invoice' ),
+			$_invoice_donate,
 			$this->set_invoice_button( $_GET['post'] )/*phpcs:ignore*/
 			);
 	}

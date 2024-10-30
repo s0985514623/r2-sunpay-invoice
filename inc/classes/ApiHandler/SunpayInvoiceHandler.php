@@ -142,10 +142,10 @@ final class SunpayInvoiceHandler {
 			$invoice_date    =$return_info['result']['crT_DAT'];
 			$invoice_number  =$return_info['result']['invoiceNumber'];
 			$invoice_message =$return_info['status'];
-			$invocie_result  = ( $invoice_date ) ? __( '<b>Invoice issue result</b>', 'woomp' ) : __( '<b>Invoice issue faild</b>', 'woomp' );
-			$invocie_time    = ( $invoice_date ) ? __( '<br>Generate Time: ', 'woomp' ) . $invoice_date : '';
-			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'woomp' ) . $invoice_number : '';
-			$invoice_msg     = __( '<br>Invoice Message: ', 'woomp' ) . $invoice_message;
+			$invocie_result  = ( $invoice_date ) ? __( '<b>Invoice issue result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invoice issue faild</b>', 'r2-sunpay-invoice' );
+			$invocie_time    = ( $invoice_date ) ? __( '<br>Generate Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
+			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
+			$invoice_msg     = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
 			$order->add_order_note( $invocie_result . $invocie_time . $invocie_number . $invoice_msg );
 
 			// 寫入發票回傳資訊

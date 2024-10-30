@@ -26,6 +26,7 @@ final class Bootstrap {
 	public function __construct() {
 		// 後台訂單列表增加單號欄位
 		Admin\OrderButton::instance();
+		Admin\Admin::instance();
 		Ajax\Ajax::instance();
 		FrontEnd\Checkout::instance();
 
@@ -34,6 +35,8 @@ final class Bootstrap {
 
 		// 增加電子發票設定頁面
 		\add_filter( 'woocommerce_get_settings_pages', [ $this,'add_setting_page' ] );
+		// 引入翻譯文件
+		\add_action('plugins_loaded', [ $this , 'plugin_load_textdomain' ], 99);
 	}
 	/**
 	 * Add Setting Page
@@ -124,5 +127,14 @@ final class Bootstrap {
 				'nonce' => \wp_create_nonce(Plugin::$kebab),
 			]
 		);
+	}
+
+	/**
+	 * Load plugin textdomain.
+	 *
+	 * @return void
+	 */
+	public function plugin_load_textdomain(): void {
+		\load_plugin_textdomain('r2-sunpay-invoice', false, dirname(plugin_basename(__FILE__), 3) . '/languages');
 	}
 }

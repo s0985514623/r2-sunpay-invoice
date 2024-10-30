@@ -49,13 +49,13 @@ final class Checkout {
 		$this->add_wc_field(
 			'invoice-type',
 			'select',
-			__( 'Invoice Type', 'woomp' ),
+			__( 'Invoice Type', 'r2-sunpay-invoice' ),
 			[],
 			'invoice-label',
 			[ // 發票開立選項
-				'individual' => __( 'individual', 'woomp' ),
-				'company'    => __( 'company', 'woomp' ),
-				// 'donate'     => __( 'donate', 'woomp' ),//不開啟
+				'individual' => __( 'individual', 'r2-sunpay-invoice' ),
+				'company'    => __( 'company', 'r2-sunpay-invoice' ),
+				// 'donate'     => __( 'donate', 'r2-sunpay-invoice' ),//不開啟
 			]
 		);
 
@@ -73,7 +73,7 @@ final class Checkout {
 		$this->add_wc_field(
 			'individual-invoice',
 			'select',
-			__( 'Individual Invoice Type', 'woomp' ),
+			__( 'Individual Invoice Type', 'r2-sunpay-invoice' ),
 			[ 'no-search' ],
 			'invoice-label',
 			$type_option,
@@ -83,7 +83,7 @@ final class Checkout {
 		// $this->add_wc_field(
 		// 'carrier-number',
 		// 'text',
-		// __( 'Carrier Number', 'woomp' ),
+		// __( 'Carrier Number', 'r2-sunpay-invoice' ),
 		// [ 'hide-option-field' ],
 		// 'invoice-label',
 		// []
@@ -93,7 +93,7 @@ final class Checkout {
 		$this->add_wc_field(
 			'company-name',
 			'text',
-			__( 'Company Name', 'woomp' ),
+			__( 'Company Name', 'r2-sunpay-invoice' ),
 			[ 'hide-option-field' ],
 			'invoice-label',
 			[]
@@ -102,7 +102,7 @@ final class Checkout {
 		$this->add_wc_field(
 			'taxid-number',
 			'text',
-			__( 'TaxID', 'woomp' ),
+			__( 'TaxID', 'r2-sunpay-invoice' ),
 			[ 'hide-option-field' ],
 			'invoice-label',
 			[]
@@ -112,7 +112,7 @@ final class Checkout {
 		// $this->add_wc_field(
 		// 'donate-number',
 		// 'select',
-		// __( 'Donate Number', 'woomp' ),
+		// __( 'Donate Number', 'r2-sunpay-invoice' ),
 		// [ 'hide-option-field' ],
 		// 'invoice-label',
 		// $this->get_donate_org(),
