@@ -49,7 +49,7 @@ final class Plugin {
 
 		$this->init(
 			[
-				'app_name'    => 'r2-sunpay-invoice',
+				'app_name'    => 'R2 Sunpay Invoice',
 				'github_repo' => 'https://github.com/s0985514623/r2-sunpay-invoice',
 				'callback'    => [ Bootstrap::class, 'instance' ],
 			]
