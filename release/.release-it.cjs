@@ -61,5 +61,6 @@ module.exports = {
 		'index.php',
 		'plugin.php',
 		'README.md',
+		'languages',
 	],
 }
