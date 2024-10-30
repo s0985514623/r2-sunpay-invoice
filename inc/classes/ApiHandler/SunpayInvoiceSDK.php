@@ -214,9 +214,6 @@ if (! class_exists( 'SunpayInvoiceSDK' ) ) {
 			];
 			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
 			$this->send['MerchantID'] = $this->merchantID;
-			ob_start();
-			var_dump($this->send);
-			\J7\WpUtils\Classes\log::info('' . ob_get_clean());
 			$response                 = wp_remote_post(
 				$this->api_url,
 				[
@@ -235,9 +232,6 @@ if (! class_exists( 'SunpayInvoiceSDK' ) ) {
 			} else {
 				$body = wp_remote_retrieve_body( $response );
 				$data = json_decode( $body, true );
-				ob_start();
-				var_dump($data);
-				\J7\WpUtils\Classes\log::info('' . ob_get_clean());
 				// 處理 $data 變量
 				return $data;
 			}
