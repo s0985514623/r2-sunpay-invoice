@@ -2,89 +2,99 @@ jQuery(function ($) {
 	function fieldDisplay(fieldControlName, fieldControlNameValue, fieldDisplay) {
 		function condition(fieldControlName) {
 			if (fieldControlName.val() === fieldControlNameValue) {
-				fieldDisplay.show();
+				fieldDisplay.show()
 			} else {
-				fieldDisplay.hide();
+				fieldDisplay.hide()
 			}
 		}
-		condition(fieldControlName);
-		fieldControlName.on("change", function () {
-			condition(fieldControlName);
-		});
+		condition(fieldControlName)
+		fieldControlName.on('change', function () {
+			condition(fieldControlName)
+		})
 	}
 
 	$(document).ready(function () {
-		$(".btnGenerateInvoice").click(function () {
-			$.blockUI({ message: "<p>處理中...</p>" });
-			$btn = $(this);
+		$('.btnGenerateInvoice').click(function () {
+			$.blockUI({ message: '<p>處理中...</p>' })
+			$btn = $(this)
 
 			const getInvoicePayload = () => {
-				const _invoice_type = $('select[name="_invoice_type"]').val() || $btn.data("invoice_type");
+				const _invoice_type =
+					$('select[name="_invoice_type"]').val() || $btn.data('invoice_type')
 
 				const defaultPayload = {
-					action: "gen_invoice",
+					action: 'gen_invoice',
 					nonce: wpApiSettings.nonce,
 					orderId: $btn.val(),
 					_invoice_type,
-				};
+				}
 
 				switch (_invoice_type) {
-					case "individual":
+					case 'individual':
 						return {
 							...defaultPayload,
 							// _invoice_individual: $(
 							// 	'select[name="_invoice_individual"]'
 							// ).val(),
 							// _invoice_carrier: $('input[name="_invoice_carrier"]').val(),
-						};
-					case "company":
+						}
+					case 'company':
 						return {
 							...defaultPayload,
-							_invoice_company_name: $(
-								'input[name="_invoice_company_name"]'
-							).val() || $btn.data("invoice_company_name"),
-							_invoice_tax_id: $('input[name="_invoice_tax_id"]').val() || $btn.data("invoice_tax_id"),
-						};
+							_invoice_company_name:
+								$('input[name="_invoice_company_name"]').val() ||
+								$btn.data('invoice_company_name'),
+							_invoice_tax_id:
+								$('input[name="_invoice_tax_id"]').val() ||
+								$btn.data('invoice_tax_id'),
+						}
 					// case "donate":
 					// 	return {
 					// 		...defaultPayload,
 					// 		_invoice_donate: $('input[name="_invoice_donate"]').val(),
 					// 	};
 					default:
-						return defaultPayload;
+						return defaultPayload
 				}
-			};
+			}
 
-			const data = getInvoicePayload();
+			const data = getInvoicePayload()
 
 			$.post(ajaxurl, data, function (response) {
-				$.unblockUI();
-				alert(response);
-				location.reload(true);
+				$.unblockUI()
+				alert(response)
+				location.reload(true)
 			}).fail(function () {
-				$.unblockUI();
-				alert("發票開立錯誤");
-			});
+				$.unblockUI()
+				alert('發票開立錯誤')
+			})
+		})
 
-		});
+		$('.btnInvalidInvoice').click(function () {
+			if (confirm('確定要刪除此筆發票')) {
+				//增加使用者輸入作廢原因
+				const userInput = window.prompt('請輸入作廢原因(字數限制20字)：')
+				if (userInput.length !== null) {
+					$.blockUI({ message: '<p>處理中...</p>' })
 
-		$(".btnInvalidInvoice").click(function () {
-			if (confirm("確定要刪除此筆發票")) {
-				$.blockUI({ message: "<p>處理中...</p>" });
+					var data = {
+						action: 'invalid_invoice',
+						nonce: wpApiSettings.nonce,
+						orderId: $(this).val(),
+						content: userInput,
+					}
 
-				var data = {
-					action: "invalid_invoice",
-					nonce: wpApiSettings.nonce,
-					orderId: $(this).val(),
-				};
-
-				$.post(ajaxurl, data, function (response) {
-					$.unblockUI();
-					alert(response);
-					location.reload(true);
-				});
+					$.post(ajaxurl, data, function (response) {
+						$.unblockUI()
+						alert(response)
+						location.reload(true)
+					}).fail(function () {
+						$.unblockUI()
+						alert('發票作廢錯誤')
+					})
+				}
 			}
-		});
+		})
 
 		// 暫時沒用到
 		// fieldDisplay(
@@ -102,34 +112,34 @@ jQuery(function ($) {
 		// 訂單電子發票欄位顯示判斷
 		fieldDisplay(
 			$('select[name="_invoice_type"'),
-			"individual",
-			$('select[name="_invoice_individual"]')
-		);
+			'individual',
+			$('select[name="_invoice_individual"]'),
+		)
 		fieldDisplay(
 			$('select[name="_invoice_type"'),
-			"individual",
-			$("#invoiceIndividual")
-		);
+			'individual',
+			$('#invoiceIndividual'),
+		)
 		fieldDisplay(
 			$('select[name="_invoice_type"'),
-			"individual",
-			$("#invoiceCarrier")
-		);
+			'individual',
+			$('#invoiceCarrier'),
+		)
 		fieldDisplay(
 			$('select[name="_invoice_type"'),
-			"company",
-			$("#invoiceCompanyName")
-		);
+			'company',
+			$('#invoiceCompanyName'),
+		)
 		fieldDisplay(
 			$('select[name="_invoice_type"'),
-			"company",
-			$("#invoiceTaxId")
-		);
+			'company',
+			$('#invoiceTaxId'),
+		)
 		fieldDisplay(
 			$('select[name="_invoice_type"'),
-			"donate",
-			$("#invoiceDonate")
-		);
+			'donate',
+			$('#invoiceDonate'),
+		)
 
 		// 暫時沒用到
 		// $('select[name="_invoice_individual"]').on("change", function () {
@@ -157,13 +167,11 @@ jQuery(function ($) {
 		// }
 
 		// 觸發變更發票資料按鈕
-		$('#sunpay_invoice_meta_box select,#sunpay_invoice_meta_box input[type="text"]').on(
-			"click",
-			function () {
-				$("#btnUpdateInvoiceData").prop("disabled", false);
-				$(".btnGenerateInvoice").prop("disabled", true);
-			}
-		);
-
-	});
-});
+		$(
+			'#sunpay_invoice_meta_box select,#sunpay_invoice_meta_box input[type="text"]',
+		).on('click', function () {
+			$('#btnUpdateInvoiceData').prop('disabled', false)
+			$('.btnGenerateInvoice').prop('disabled', true)
+		})
+	})
+})

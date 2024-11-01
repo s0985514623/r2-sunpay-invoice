@@ -236,6 +236,50 @@ if (! class_exists( 'SunpayInvoiceSDK' ) ) {
 				return $data;
 			}
 		}
+
+		/**
+		 * 作廢發票function
+		 *
+		 * @return array{
+		 * status:string,
+		 * message:string,
+		 * result:array{
+		 * merchantID:string,
+		 * invoiceNumber":string,
+		 * cancelDateTime":string,
+		 * }
+		 * } 發票回傳資訊
+		 */
+		public function invoice_invalid() {
+			$time_stamp               = time()+( 8*3600 );// 台灣時區
+			$data                     = [
+				'CompanyID' => $this->CompanyID,
+				'TimeStamp' => (string) $time_stamp,
+			];
+			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
+			$this->send['MerchantID'] = $this->merchantID;
+			$response                 = wp_remote_post(
+				$this->api_url,
+				[
+					'body' => json_encode(
+					$this->send
+					),
+					'headers' => [
+						'Content-Type' => 'application/json; charset=utf-8',
+						'Accept'       => 'application/json',
+					],
+				]
+				);
+			if ( is_wp_error( $response ) ) {
+				$error_message = $response->get_error_message();
+				return "Something went wrong: $error_message";
+			} else {
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				// 處理 $data 變量
+				return $data;
+			}
+		}
 		/**
 		 * Token加密
 		 *

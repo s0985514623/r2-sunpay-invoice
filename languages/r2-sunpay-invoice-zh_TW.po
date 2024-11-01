@@ -192,3 +192,15 @@ msgstr "<br>回傳訊息: "
 #: inc/classes/FrontEnd/Checkout.php:76
 msgid "Individual Invoice Type"
 msgstr "個人發票類型"
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:206
+msgid "<b>Invalid invoice result</b>"
+msgstr "<b>作廢發票結果</b>"
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:207
+msgid "<br>Invalid Time: "
+msgstr "<br>作廢時間: "
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:209
+msgid "<br>Cancel Reason: "
+msgstr "<br>作廢原因: "

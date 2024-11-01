@@ -55,7 +55,7 @@ final class Ajax {
 			'_invoice_tax_id'       => isset($_POST['_invoice_tax_id']) ?sanitize_text_field(wp_unslash($_POST['_invoice_tax_id']) ):'',
 			'_invoice_donate'       => isset($_POST['_invoice_donate'])?sanitize_text_field(wp_unslash($_POST['_invoice_donate'])  ):'',
 		];
-		$order = wc_get_order( $order_id );
+		$order        = wc_get_order( $order_id );
 		$order->update_meta_data( '_sunpay_invoice_data', $invoice_data );
 		$order->save();
 
@@ -64,6 +64,26 @@ final class Ajax {
 			$msg = $this->invoice_handler->generate_invoice( $order_id );
 			echo $msg;
 		}
+		wp_die();
+	}
+	/**
+	 * Invalid Invoice
+	 *
+	 * @return void
+	 */
+	public function invalid_invoice() {
+		// Security check
+		\check_ajax_referer(Plugin::$kebab, 'nonce');
+		$order_id = isset($_POST['orderId'])?intval( sanitize_text_field( wp_unslash($_POST['orderId']) ) ):'';
+		$content  = isset($_POST['content'])?sanitize_text_field( wp_unslash($_POST['content']) ):'';
+		if ( ! empty( $order_id ) ) {
+			$msg = $this->invoice_handler->invalid_invoice( $order_id, $content );
+			// $msg = $content;
+			echo $msg;
+		}
+		// $order = wc_get_order( $order_id );
+		// $order->update_meta_data( '_sunpay_invoice_status', '0' );
+		// $order->save();
 		wp_die();
 	}
 }
