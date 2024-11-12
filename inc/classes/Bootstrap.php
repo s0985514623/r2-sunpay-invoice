@@ -24,11 +24,11 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
-		// 後台訂單列表增加單號欄位
-		Admin\OrderButton::instance();
-		Admin\Admin::instance();
-		Ajax\Ajax::instance();
-		FrontEnd\Checkout::instance();
+		Admin\OrderButton::instance();// 後台訂單列表及詳情增加單號欄位/按鈕
+		Admin\Admin::instance();// 管理自動開立發票or手動開立 Class
+		Ajax\Ajax::instance();// 後台發票列表查詢
+		FrontEnd\Checkout::instance();// 前台結帳頁面
+		Admin\InvoiceList::instance();// 查詢發票列表 Class
 
 		// 前端載入 script
 		\add_action('admin_enqueue_scripts', [ $this, 'admin_enqueue_script' ], 99);
@@ -66,7 +66,7 @@ final class Bootstrap {
 			wp_enqueue_script( 'sunpay-invoice-admin', Plugin::$url . '/inc/classes/Admin/js/sunpay-invoice-admin.js', [ 'jquery' ], Plugin::$version, true );
 		}
 
-		self::enqueue_script();
+		// self::enqueue_script();
 	}
 
 
@@ -112,7 +112,7 @@ final class Bootstrap {
 					'KEBAB'         => Plugin::$kebab,
 					'SNAKE'         => Plugin::$snake,
 					'BASE_URL'      => Base::BASE_URL,
-					'APP1_SELECTOR' => Base::APP1_SELECTOR,
+					'APP1_SELECTOR' => '#' . Plugin::$snake,
 					'APP2_SELECTOR' => Base::APP2_SELECTOR,
 					'API_TIMEOUT'   => Base::API_TIMEOUT,
 					'nonce'         => \wp_create_nonce(Plugin::$kebab),

@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace J7\R2SunpayInvoice\Admin;
 
-if (class_exists('J7\R2SunpayInvoice\FrontEnd\OrderButton')) {
+if (class_exists('J7\R2SunpayInvoice\Admin\OrderButton')) {
 	return;
 }
 /**

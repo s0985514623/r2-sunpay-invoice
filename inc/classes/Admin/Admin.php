@@ -10,7 +10,7 @@ namespace J7\R2SunpayInvoice\Admin;
 
 use J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler;
 
-if (class_exists('J7\R2SunpayInvoice\FrontEnd\Admin')) {
+if (class_exists('J7\R2SunpayInvoice\Admin\Admin')) {
 	return;
 }
 /**

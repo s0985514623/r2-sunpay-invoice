@@ -14,7 +14,7 @@ namespace J7\R2SunpayInvoice\ApiHandler;
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 
-if (! class_exists( 'SunpayInvoiceSDK' ) ) {
+if (! class_exists( 'J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceSDK' ) ) {
 	/**
 	 * Class SunpayInvoice
 	 */
@@ -214,18 +214,7 @@ if (! class_exists( 'SunpayInvoiceSDK' ) ) {
 			];
 			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
 			$this->send['MerchantID'] = $this->merchantID;
-			$response                 = wp_remote_post(
-				$this->api_url,
-				[
-					'body' => json_encode(
-					$this->send
-					),
-					'headers' => [
-						'Content-Type' => 'application/json; charset=utf-8',
-						'Accept'       => 'application/json',
-					],
-				]
-				);
+			$response                 = $this->send();
 			if ( is_wp_error( $response ) ) {
 				$error_message = $response->get_error_message();
 				return "Something went wrong: $error_message";
@@ -258,7 +247,88 @@ if (! class_exists( 'SunpayInvoiceSDK' ) ) {
 			];
 			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
 			$this->send['MerchantID'] = $this->merchantID;
-			$response                 = wp_remote_post(
+			$response                 = $this->send();
+			if ( is_wp_error( $response ) ) {
+				$error_message = $response->get_error_message();
+				return "Something went wrong: $error_message";
+			} else {
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				// 處理 $data 變量
+				return $data;
+			}
+		}
+
+		/**
+		 * 取得發票列表function
+		 *
+		 * @return array{
+		 * status:string,
+		 * message:string,
+		 * result:array{
+		 * merchantID:string,
+		 * orderNo:string,
+		 * b2B:string,
+		 * buyerIdentifier:string,
+		 * buyerName:string,
+		 * buyerEmailAddress:string,
+		 * buyerTelephoneNumber:string,
+		 * buyerAddress:string,
+		 * invoiceType:Integer,
+		 * orintFlag:string,
+		 * isPrint:Integer,
+		 * printCount:Integer,
+		 * donateMark:Integer,
+		 * poban:string,
+		 * carrierType:Integer,
+		 * carrierId1:string,
+		 * taxType:Integer,
+		 * taxRate:Decimal,
+		 * taxAmount:Decimal,
+		 * salesAmount:Decimal,
+		 * zeroTaxSalesAmount:Decimal,
+		 * freeTaxSalesAmount:Decimal,
+		 * totalAmount:Decimal,
+		 * productItems:productItems[],
+		 * hasAllowance:Boolean,
+		 * allowanceBalance:Integer,
+		 * flagA:String,
+		 * flagCancel:Integer,
+		 * invoiceNumber:string,
+		 * randomNumber:string,
+		 * CRT_DAT:DateTime,
+		 * barcode:string,
+		 * leftQrCode:string,
+		 * rightQrCode:string
+		 * }}
+		 */
+		public function invoice_list() {
+			$time_stamp               = time()+( 8*3600 );// 台灣時區
+			$data                     = [
+				'CompanyID' => $this->CompanyID,
+				'TimeStamp' => (string) $time_stamp,
+			];
+			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
+			$this->send['merchantID'] = $this->merchantID;
+			ob_start();
+			var_dump($this->send);
+			\J7\WpUtils\Classes\log::info('' . ob_get_clean());
+			$response                 = $this->send();
+			if ( is_wp_error( $response ) ) {
+				$error_message = $response->get_error_message();
+				return "Something went wrong: $error_message";
+			} else {
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				// 處理 $data 變量
+				return $data;
+			}
+		}
+		/**
+		 * Send Function
+		 */
+		public function send() {
+			return wp_remote_post(
 				$this->api_url,
 				[
 					'body' => json_encode(
@@ -270,15 +340,6 @@ if (! class_exists( 'SunpayInvoiceSDK' ) ) {
 					],
 				]
 				);
-			if ( is_wp_error( $response ) ) {
-				$error_message = $response->get_error_message();
-				return "Something went wrong: $error_message";
-			} else {
-				$body = wp_remote_retrieve_body( $response );
-				$data = json_decode( $body, true );
-				// 處理 $data 變量
-				return $data;
-			}
 		}
 		/**
 		 * Token加密

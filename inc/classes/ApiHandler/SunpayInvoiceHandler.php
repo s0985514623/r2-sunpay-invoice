@@ -11,7 +11,7 @@ namespace J7\R2SunpayInvoice\ApiHandler;
 
 use const Avifinfo\UNDEFINED;
 
-if (class_exists('J7\R2SunpayInvoice\Ajax\SunpayInvoiceHandler')) {
+if (class_exists('J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler')) {
 	return;
 }
 
@@ -26,7 +26,7 @@ final class SunpayInvoiceHandler {
 	 *
 	 * @param int $order_id 訂單ID
 	 *
-	 * return void
+	 * return string
 	 */
 	public function generate_invoice( $order_id ) {
 		$order       = wc_get_order( $order_id );
@@ -145,7 +145,14 @@ final class SunpayInvoiceHandler {
 			$invocie_result  = ( $invoice_date ) ? __( '<b>Invoice issue result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invoice issue faild</b>', 'r2-sunpay-invoice' );
 			$invocie_time    = ( $invoice_date ) ? __( '<br>Generate Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
 			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
-			$invoice_msg     = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $return_info['message'];
+			} else {
+				$invoice_msg = '';
+			}
+
 			$order->add_order_note( $invocie_result . $invocie_time . $invocie_number . $invoice_msg );
 
 			// 寫入發票回傳資訊
@@ -168,7 +175,7 @@ final class SunpayInvoiceHandler {
 	 * @param int    $order_id 訂單ID
 	 * @param string $content 作廢原因
 	 *
-	 * return void
+	 * return string
 	 */
 	public function invalid_invoice( $order_id, $content ) {
 		$order       = wc_get_order( $order_id );
@@ -219,6 +226,46 @@ final class SunpayInvoiceHandler {
 				$order->save();
 			}
 			return $invoice_message;
+		} catch (\Exception $e) {
+			// 例外錯誤處理.
+			return new \WP_Error( 'error', $e->getMessage() );
+		}
+	}
+	/**
+	 * 查詢發票
+	 *
+	 * @param string $invoice_numbers 發票號碼多筆陣列
+	 * @param string $order_no 自訂訂單編號
+	 *
+	 * return JSON
+	 */
+	public function get_invoice_list( $invoice_numbers = '', $order_no = '' ) {
+		$is_testmode = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$api_url     = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/GetInvoiceList':'https://inv.sunpay.com.tw/api/v1/SunPay/GetInvoiceList';
+		try {
+			// 1.載入SDK程式
+			$sunpay_invoice = new SunpayInvoiceSDK();
+
+			// 2.寫入基本介接參數
+			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
+			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_options('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
+			$sunpay_invoice->api_url    = $api_url;
+
+			// 3.寫入發票資訊
+			$sunpay_invoice->send =[];// 清空send中的資料
+			if (isset($invoice_numbers) && $invoice_numbers !=='') {
+				$sunpay_invoice->send['invoiceNumbers'] = $invoice_numbers;
+			}
+			if (isset($order_no) && $order_no !=='') {
+				$sunpay_invoice->send['orderNo'] = $order_no;
+			}
+
+			// 4.送出
+			$return_info = $sunpay_invoice->invoice_list();
+
+			return $return_info;
 		} catch (\Exception $e) {
 			// 例外錯誤處理.
 			return new \WP_Error( 'error', $e->getMessage() );
