@@ -9,6 +9,7 @@ namespace J7\R2SunpayInvoice\Ajax;
 
 use J7\R2SunpayInvoice\Plugin;
 use J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler;
+use MongoDB\BSON\Undefined;
 
 if (class_exists('J7\R2SunpayInvoice\Ajax\Ajax')) {
 	return;
@@ -94,13 +95,25 @@ final class Ajax {
 	public function get_invoice_list() {
 		// Security check
 		\check_ajax_referer(Plugin::$kebab, 'nonce');
-		$invoice_numbers = isset($_POST['invoiceNumbers'])? sanitize_text_field( wp_unslash($_POST['invoiceNumbers']) ) :'';
-		$order_no        = isset($_POST['orderNo'])?sanitize_text_field( wp_unslash($_POST['orderNo']) ):'';
+		$invoice_numbers = isset($_POST['invoiceNumbers'])? sanitize_text_field(wp_unslash($_POST['invoiceNumbers'])):'';
+		$order_no        = isset($_POST['orderNo'])? sanitize_text_field(wp_unslash($_POST['orderNo'])):'';
+
 		$invoice_list    = $this->invoice_handler->get_invoice_list( $invoice_numbers, $order_no );
-		ob_start();
-		var_dump($invoice_list);
-		\J7\WpUtils\Classes\log::info('' . ob_get_clean());
-		return $invoice_list;
+		if (400 === $invoice_list['status']) {
+			$return = [
+				'message' => 'error',
+				'data'    => $invoice_list,
+			];
+			\wp_send_json($return);
+			\wp_die();
+		} else {
+			$return = [
+				'message' => 'success',
+				'data'    => $invoice_list,
+			];
+			\wp_send_json($return);
+			\wp_die();
+		}
 	}
 	/**
 	 * Get OrderNo And InvoiceNo From DateRange
@@ -120,7 +133,7 @@ final class Ajax {
 		// 取得訂單
 		$orders     =wc_get_orders($args);
 		$order_no   =[];
-		$invoice_no =[];
+		$invoice_no =[ 'test01' ];
 		foreach ($orders as $order) {
 			$order_no[] = $order->get_order_number();
 			if (!empty($order->get_meta('_sunpay_invoice_number'))) {

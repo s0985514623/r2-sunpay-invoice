@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Form, Select, Button, DatePicker, Collapse } from 'antd'
+import { Form, Select, Button, DatePicker, Collapse, Divider } from 'antd'
 import type { TimeRangePickerProps } from 'antd'
 import dayjs from 'dayjs'
 import { useGetOrders } from '@/hooks'
+import { TFilter } from '../types'
 
 const { RangePicker } = DatePicker
 const { Option } = Select
@@ -12,19 +13,27 @@ const rangePresets: TimeRangePickerProps['presets'] = [
 	{ label: 'Last 30 Days', value: [dayjs().add(-30, 'd'), dayjs()] },
 	{ label: 'Last 90 Days', value: [dayjs().add(-90, 'd'), dayjs()] },
 ]
-const index: React.FC = () => {
+const index: React.FC<{ onFilter: (values: TFilter) => void , isOutLoading:boolean }> = ({
+	onFilter,isOutLoading
+}) => {
 	const [form] = Form.useForm()
+	// 取得訂單編號與發票號碼
 	const { mutate, isLoading, meta } = useGetOrders({
 		startDate: dayjs().add(-30, 'd').format('YYYY-MM-DD'),
 		endDate: dayjs().format('YYYY-MM-DD'),
 	})
-	const [orderNo, setOrderNo] = useState(meta?.order_no || [])
+	const [orderNos, setOrderNos] = useState(meta?.order_no || [])
 	const [invoiceNo, setInvoiceNo] = useState(meta?.invoice_no || [])
 	useEffect(() => {
-		setOrderNo(meta?.order_no || [])
+		setOrderNos(meta?.order_no || [])
 		setInvoiceNo(meta?.invoice_no || [])
 	}, [meta])
-	const handleValuesChange = (changedValues: any, allValues: any) => {
+
+	// 記錄當前選擇的是訂單編號還是發票號碼, 用於判斷是否要禁用另一個選項
+	const [orderNosOrInvoiceNo, setOrderNosOrInvoiceNo] = useState<string>('')
+	// 處理日期範圍變更重打AJAX獲取訂單,以及禁用訂單編號與發票號碼
+	const handleValuesChange = (changedValues: TFilter, allValues: TFilter) => {
+
 		if (changedValues.dateRange) {
 			mutate(
 				{
@@ -34,7 +43,7 @@ const index: React.FC = () => {
 				},
 				{
 					onSuccess: (data) => {
-						setOrderNo(data.data.data.order_no)
+						setOrderNos(data.data.data.order_no)
 						setInvoiceNo(data.data.data.invoice_no)
 					},
 					onError: (error) => {
@@ -43,13 +52,36 @@ const index: React.FC = () => {
 				},
 			)
 		}
+		//orderNos 只能單筆
+		if (changedValues.orderNos) {
+			setOrderNosOrInvoiceNo('orderNos')
+		} else {
+			setOrderNosOrInvoiceNo('')
+		}
+		//invoiceNos 可以多筆
+		if (changedValues.invoiceNos) {
+			if (changedValues.invoiceNos.length > 0) {
+				setOrderNosOrInvoiceNo('invoiceNos')
+			} else {
+				setOrderNosOrInvoiceNo('')
+			}
+		}
 	}
 
+	// 處理表單提交
+	const handleOnFinish = (values: any) => {
+		onFilter(values)
+	}
 
 	const children = (
 		<div className="w-full relative">
 			<div>
-				<Form layout="vertical" onValuesChange={handleValuesChange}>
+				<Form
+					form={form}
+					layout="vertical"
+					onValuesChange={handleValuesChange}
+					onFinish={handleOnFinish}
+				>
 					<div className="grid grid-cols-3 gap-6">
 						<Form.Item
 							label="日期範圍"
@@ -58,17 +90,50 @@ const index: React.FC = () => {
 						>
 							<RangePicker presets={rangePresets} className="w-full" />
 						</Form.Item>
-						<Form.Item label="訂單編號" name="orderNo">
-							<Select loading={isLoading}>
-								{orderNo?.map((item) => (
+						<Form.Item label="訂單編號" name="orderNos">
+							<Select
+								disabled={isLoading || orderNosOrInvoiceNo === 'invoiceNos'}
+								loading={isLoading}
+								allowClear={true}
+							>
+								{orderNos?.map((item) => (
 									<Option key={item} value={item}>
 										{item}
 									</Option>
 								))}
 							</Select>
 						</Form.Item>
-						<Form.Item label="發票號碼" name="invoiceNo">
-							<Select loading={isLoading}>
+						<Form.Item label="發票號碼" name="invoiceNos">
+							<Select
+								dropdownRender={(menu) => (
+									<>
+										<div className="flex justify-between p-2">
+											<Button
+												type="link"
+												onClick={() =>
+													form.setFieldsValue({ orderNos: orderNos })
+												}
+											>
+												全選
+											</Button>
+											<Button
+												type="link"
+												onClick={() => {
+													form.setFieldsValue({ orderNos: [] })
+													setOrderNosOrInvoiceNo('')
+												}}
+											>
+												清除選項
+											</Button>
+										</div>
+										<Divider style={{ margin: '4px 0' }} />
+										{menu}
+									</>
+								)}
+								disabled={isLoading || orderNosOrInvoiceNo === 'orderNos'}
+								loading={isLoading}
+								mode="multiple"
+							>
 								{invoiceNo?.map((item) => (
 									<Option key={item} value={item}>
 										{item}
@@ -78,7 +143,7 @@ const index: React.FC = () => {
 						</Form.Item>
 					</div>
 					<Form.Item className="mt-6">
-						<Button type="primary" htmlType="submit" className="w-full">
+						<Button type="primary" htmlType="submit" className="w-full" loading={isOutLoading}>
 							查詢
 						</Button>
 					</Form.Item>

@@ -310,9 +310,6 @@ if (! class_exists( 'J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceSDK' ) ) {
 			];
 			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
 			$this->send['merchantID'] = $this->merchantID;
-			ob_start();
-			var_dump($this->send);
-			\J7\WpUtils\Classes\log::info('' . ob_get_clean());
 			$response                 = $this->send();
 			if ( is_wp_error( $response ) ) {
 				$error_message = $response->get_error_message();

@@ -6,7 +6,7 @@ import { AxiosRequestConfig } from 'axios'
 export type TAdminAjaxArgs = {
 	action: string
 	nonce: string
-	[key: string]: string | number | undefined
+	[key: string]: string | number | undefined | string[]
 }
 
 export const adminAjax = async ({
