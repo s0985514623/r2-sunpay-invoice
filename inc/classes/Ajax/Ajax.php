@@ -9,7 +9,6 @@ namespace J7\R2SunpayInvoice\Ajax;
 
 use J7\R2SunpayInvoice\Plugin;
 use J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler;
-use MongoDB\BSON\Undefined;
 
 if (class_exists('J7\R2SunpayInvoice\Ajax\Ajax')) {
 	return;
@@ -44,7 +43,6 @@ final class Ajax {
 	 * @return void
 	 */
 	public function generate_invoice() {
-
 		// Security check
 		\check_ajax_referer(Plugin::$kebab, 'nonce');
 
@@ -96,24 +94,57 @@ final class Ajax {
 		// Security check
 		\check_ajax_referer(Plugin::$kebab, 'nonce');
 		$invoice_numbers = isset($_POST['invoiceNumbers'])? sanitize_text_field(wp_unslash($_POST['invoiceNumbers'])):'';
-		$order_no        = isset($_POST['orderNo'])? sanitize_text_field(wp_unslash($_POST['orderNo'])):'';
-
-		$invoice_list    = $this->invoice_handler->get_invoice_list( $invoice_numbers, $order_no );
-		if (400 === $invoice_list['status']) {
-			$return = [
-				'message' => 'error',
-				'data'    => $invoice_list,
-			];
-			\wp_send_json($return);
-			\wp_die();
-		} else {
-			$return = [
-				'message' => 'success',
-				'data'    => $invoice_list,
-			];
-			\wp_send_json($return);
-			\wp_die();
+		$order_no        = isset($_POST['orderNos'])? sanitize_text_field(wp_unslash( $_POST['orderNos'] )):'';
+		// 紅陽API 的order_no自訂編號只能單筆獲取，若要多筆的話則多次發送單筆API
+		$order_no_array        =explode(',', $order_no);
+		$invoice_numbers_array =explode(',', $invoice_numbers);
+		$invoice_list_data     = [];
+		// 以order_no_array為基準，逐筆取得invoice_list
+		foreach ($order_no_array as $order_no) {
+			$invoice_list = $this->invoice_handler->get_invoice_list( $invoice_numbers_array, $order_no );
+			// 回傳值都是成功,失敗筆數紀錄在data中
+			if ('SUCCESS'===$invoice_list['status']) {
+				if (empty($invoice_list['result'])) {
+					$invoice_list_data['result'][] =[
+						'orderNo'       =>$order_no,
+						'invoiceNumber' =>'尚未開立',
+					];
+				} else {
+					foreach ($invoice_list['result'] as $result) {
+						$invoice_list_data['result'][] =$result;
+					}
+				}
+			} elseif (400 === $invoice_list['status']) {
+				$invoice_list_data['result'][] =[
+					'orderNo'       =>$order_no,
+					'invoiceNumber' =>'尚未開立',
+				];
+			}
 		}
+		$return = [
+			'message' => 'success',
+			'data'    => $invoice_list_data,
+		];
+		\wp_send_json($return);
+		\wp_die();
+
+		// $invoice_list = $this->invoice_handler->get_invoice_list( $invoice_numbers, '3670' );
+
+		// if (400 === $invoice_list['status']) {
+		// $return = [
+		// 'message' => 'error',
+		// 'data'    => $invoice_list,
+		// ];
+		// \wp_send_json($return);
+		// \wp_die();
+		// } else {
+		// $return = [
+		// 'message' => 'success',
+		// 'data'    => $invoice_list,
+		// ];
+		// \wp_send_json($return);
+		// \wp_die();
+		// }
 	}
 	/**
 	 * Get OrderNo And InvoiceNo From DateRange
@@ -133,7 +164,7 @@ final class Ajax {
 		// 取得訂單
 		$orders     =wc_get_orders($args);
 		$order_no   =[];
-		$invoice_no =[ 'test01' ];
+		$invoice_no =[];
 		foreach ($orders as $order) {
 			$order_no[] = $order->get_order_number();
 			if (!empty($order->get_meta('_sunpay_invoice_number'))) {

@@ -11,7 +11,6 @@ const InvoiceList: React.FC = () => {
 	const { mutate, isLoading } = mutation
 	const [data, setData] = useState<any>([])
 	const [modalVisible, setModalVisible] = useState(false)
-	console.log("🚀 ~ modalVisible:", modalVisible)
 	const [modalData, setModalData] = useState<TModalProps['dataSource']>([])
 
 	//處理Filter 返回的資料
@@ -20,9 +19,9 @@ const InvoiceList: React.FC = () => {
 			{
 				action: 'get_invoice_list',
 				invoiceNumbers: values.invoiceNos
-					? JSON.stringify(values.invoiceNos)
+					? values.invoiceNos
 					: '',
-				orderNo: values.orderNos ? values.orderNos : '',
+				orderNos: values.orderNos ? values.orderNos : '',
 			},
 			{
 				onSuccess: (data) => {

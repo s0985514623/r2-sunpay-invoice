@@ -64,6 +64,7 @@ final class Bootstrap {
 		if ( $screen && $screen->post_type === 'shop_order' ) {
 			// 載入 sunpay-invoice-admin.js
 			wp_enqueue_script( 'sunpay-invoice-admin', Plugin::$url . '/inc/classes/Admin/js/sunpay-invoice-admin.js', [ 'jquery' ], Plugin::$version, true );
+			self::enqueue_script();
 		}
 
 		// self::enqueue_script();

@@ -255,7 +255,7 @@ final class SunpayInvoiceHandler {
 
 			// 3.寫入發票資訊
 			$sunpay_invoice->send =[];// 清空send中的資料
-			if (isset($invoice_numbers) && $invoice_numbers !=='') {
+			if (isset($invoice_numbers) && $invoice_numbers !==[ '' ]) {
 				$sunpay_invoice->send['invoiceNumbers'] = $invoice_numbers;
 			}
 			if (isset($order_no) && $order_no !=='') {
