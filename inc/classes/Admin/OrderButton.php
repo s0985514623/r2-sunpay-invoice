@@ -126,9 +126,12 @@ final class OrderButton {
 		$_invoice_company_name = ( array_key_exists( '_invoice_company_name', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_company_name'] : '';
 		$_invoice_tax_id       = ( array_key_exists( '_invoice_tax_id', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_tax_id'] : '';
 		$_invoice_donate       = ( array_key_exists( '_invoice_donate', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_donate'] : '';
+		$_invoice_number       = $order->get_meta( '_sunpay_invoice_number' ) ?? '';
 
 		\printf(
-			/*html*/'<p><strong>%1$s</strong></p>
+			/*html*/'
+			<p>%17$s<strong>%18$s</strong></p>
+			<p><strong>%1$s</strong></p>
 			<select name="_invoice_type" style="display:block;width:100%%;margin-top:-8px;">
 				<option value="individual" %5$s >%2$s</option>
 				<option value="company" %6$s >%3$s</option>
@@ -159,7 +162,9 @@ final class OrderButton {
 			$_invoice_tax_id,
 			__( 'Donate Number', 'r2-sunpay-invoice' ),
 			$_invoice_donate,
-			$this->set_invoice_button( $_GET['post'] )/*phpcs:ignore*/
+			$this->set_invoice_button( $_GET['post'] ),/*phpcs:ignore*/
+			__( 'Invoice Number: ', 'r2-sunpay-invoice' ),
+			$_invoice_number
 			);
 	}
 
