@@ -108,7 +108,7 @@ final class SunpayInvoiceHandler {
 			// 2.寫入基本介接參數
 			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
 			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
-			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_options('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_option('wc_woomp_sunpay_invoice_hashkey');
 			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
 			$sunpay_invoice->api_url    = $invoice_data['_invoice_type'] === 'company'?$b2b_api_url:$b2c_api_url;
 
