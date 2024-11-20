@@ -184,7 +184,7 @@ final class SunpayInvoiceHandler {
 		if ( '0' === $order_total ) {
 			return;
 		}
-		$is_testmode    = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$is_testmode    = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
 		$api_url        = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceInvalid':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceInvalid';
 		$invoice_number = $order->get_meta( '_sunpay_invoice_number' );
 		try {
@@ -246,7 +246,7 @@ final class SunpayInvoiceHandler {
 	 * return JSON
 	 */
 	public function get_invoice_list( $invoice_numbers = '', $order_no = '' ) {
-		$is_testmode = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$is_testmode = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
 		$api_url     = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/GetInvoiceList':'https://inv.sunpay.com.tw/api/v1/SunPay/GetInvoiceList';
 		try {
 			// 1.載入SDK程式
