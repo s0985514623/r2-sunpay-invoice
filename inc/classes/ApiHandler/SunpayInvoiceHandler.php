@@ -38,7 +38,7 @@ final class SunpayInvoiceHandler {
 
 		$order_info   = $order->get_address();
 		$invoice_data = $order->get_meta( '_sunpay_invoice_data' );
-		$is_testmode  = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$is_testmode  = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
 		$is_b2b       = $invoice_data['_invoice_type'] === 'company';
 		$b2c_api_url  = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2c':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2c';
 		$b2b_api_url  = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2b':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2b';
