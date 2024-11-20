@@ -185,6 +185,10 @@ msgstr "<br>產生時間: "
 msgid "<br>Invoice Number: "
 msgstr "<br>發票號碼: "
 
+#: inc/classes/Admin/OrderButton.php:165
+msgid "Invoice Number: "
+msgstr "發票號碼: "
+
 #: inc/classes/ApiHandler/SunpayInvoiceHandler.php:148
 msgid "<br>Invoice Message: "
 msgstr "<br>回傳訊息: "

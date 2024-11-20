@@ -54,11 +54,9 @@ final class Bootstrap {
 	 * Admin Enqueue script
 	 * You can load the script on demand
 	 *
-	 * @param string $hook current page hook
-	 *
 	 * @return void
 	 */
-	public static function admin_enqueue_script( $hook ): void {
+	public static function admin_enqueue_script(): void {
 		// 只在訂單頁面載入Sunpay-invoice-admin.js
 		$screen = \get_current_screen();
 		if ( $screen && $screen->post_type === 'shop_order' ) {
@@ -66,8 +64,6 @@ final class Bootstrap {
 			wp_enqueue_script( 'sunpay-invoice-admin', Plugin::$url . '/inc/classes/Admin/js/sunpay-invoice-admin.js', [ 'jquery' ], Plugin::$version, true );
 			self::enqueue_script();
 		}
-
-		// self::enqueue_script();
 	}
 
 

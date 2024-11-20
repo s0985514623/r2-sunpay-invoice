@@ -24,6 +24,7 @@ final class OrderButton {
 		add_filter( 'manage_shop_order_posts_columns', [ $this, 'shop_order_columns' ], 11, 1 );
 		add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_column' ], 11, 2 );
 		add_action( 'add_meta_boxes', [ $this, 'add_metabox' ] );
+		// add_action( 'woocommerce_admin_order_data_after_order_details', [ $this,'set_dialog_modal' ] );
 	}
 
 	/**
@@ -89,6 +90,14 @@ final class OrderButton {
 			'side',
 			'high'
 		);
+		// \add_meta_box(
+		// 	'sunpay_allowance_meta_box',
+		// 	__( '紅陽折讓發票', 'r2-sunpay-invoice' ),
+		// 	[ $this, 'allowance_meta_box' ],
+		// 	'shop_order',
+		// 	'side',
+		// 	'high'
+		// );
 	}
 	/**
 	 * Meta box callback
@@ -126,9 +135,11 @@ final class OrderButton {
 		$_invoice_company_name = ( array_key_exists( '_invoice_company_name', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_company_name'] : '';
 		$_invoice_tax_id       = ( array_key_exists( '_invoice_tax_id', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_tax_id'] : '';
 		$_invoice_donate       = ( array_key_exists( '_invoice_donate', $order->get_meta( '_sunpay_invoice_data' ) ) ) ? $order->get_meta( '_sunpay_invoice_data' )['_invoice_donate'] : '';
-
+		$_invoice_number       = $order->get_meta( '_sunpay_invoice_number' ) ?? '';
 		\printf(
-			/*html*/'<p><strong>%1$s</strong></p>
+			/*html*/'
+			<p>%17$s<strong>%18$s</strong></p>
+			<p><strong>%1$s</strong></p>
 			<select name="_invoice_type" style="display:block;width:100%%;margin-top:-8px;">
 				<option value="individual" %5$s >%2$s</option>
 				<option value="company" %6$s >%3$s</option>
@@ -159,8 +170,46 @@ final class OrderButton {
 			$_invoice_tax_id,
 			__( 'Donate Number', 'r2-sunpay-invoice' ),
 			$_invoice_donate,
-			$this->set_invoice_button( $_GET['post'] )/*phpcs:ignore*/
+			$this->set_invoice_button( $_GET['post'] ),/*phpcs:ignore*/
+			__( 'Invoice Number: ', 'r2-sunpay-invoice' ),
+			$_invoice_number
 			);
+	}
+	/**
+	 * 折讓發票meta box callback
+	 *
+	 * @return void
+	 */
+	public function allowance_meta_box(): void {
+		if ( ! isset( $_GET['post'] ) ) {
+			return;
+		}
+		/*phpcs:ignore*/
+		$order = wc_get_order( $_GET['post'] );
+		if ( ! $order ) {
+			return;
+		}
+		$product_type = '';
+
+		foreach ( $order->get_items() as $item ) {
+			/** @var WC_Order_Item_Product $item */
+			$product_type = \WC_Product_Factory::get_product_type( $item->get_product_id() );
+		}
+
+		if ( '0' === $order->get_total() && strpos( $product_type, 'subscription' ) === false ) {
+			return;
+		}
+
+		$_invoice_allowance = $order->get_meta( '_sunpay_invoice_allowance' ) ?? '';
+		\printf(
+			/*html*/'
+			<p>%1$s<strong>%2$s</strong></p>
+			%3$s
+			',
+			__( 'Invoice Allowance: ', 'r2-sunpay-invoice' ),
+			$_invoice_allowance,
+			$this->set_allowance_button( $_GET['post'] ),/*phpcs:ignore*/
+		);
 	}
 
 	/**
@@ -184,5 +233,61 @@ final class OrderButton {
 		$output .= '</div>';
 
 		return $output;
+	}
+	/**
+	 *  折讓發票按鈕
+	 *
+	 * @param int $order_id 訂單ID
+	 * @return string
+	 */
+	private function set_allowance_button( $order_id ) {
+
+		$order  = \wc_get_order( $order_id );
+		$output = '<div style="display:flex;justify-content:space-between">';
+
+		// 產生按鈕，傳送 order id 給ajax js
+		if ( empty( $order->get_meta( '_sunpay_invoice_allowance' ) ) ) {
+			$output .= "<button class='button btnGenerateAllowance' type='button' value='" . $order_id . "'>開立折讓發票</button>";
+		} else {
+			$output .= "<button class='button btnInvalidAllowance' type='button' value='" . $order_id . "'>作廢折讓發票</button>";
+		}
+
+		$output .= '</div>';
+
+		return $output;
+	}
+	/**
+	 * 添加瀏覽器原生彈窗
+	 * 用於填寫折讓發票資料
+	 *
+	 * @param object $order 訂單物件
+	 * @return string
+	 */
+	public function set_dialog_modal( $order ) {
+		$order_id = $order->get_id();
+		// 開啟輸出緩衝
+		// ob_start();
+		// $html = '';
+		echo (
+			/*html */'
+			<dialog id="r2Dialog">
+				<h3>這是模態框</h3>
+				<form method="dialog" id="dialogForm">
+					<label>
+						商品名稱：
+						<input type="text" name="description" required>
+					</label><br>
+					<label>
+						商品數量：
+						<input type="email" name="quantity" required>
+					</label><br><br>
+					<button type="submit" id="confirmDialog">提交</button>
+					<button type="button" id="cancelDialog">取消</button>
+				</form>
+			</dialog>
+			'
+		);
+		// $html .= ob_get_clean();
+		// return $html;
 	}
 }

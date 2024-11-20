@@ -96,6 +96,36 @@ jQuery(function ($) {
 			}
 		})
 
+		// const dialog = document.getElementById('r2Dialog')
+		// const form = document.getElementById('dialogForm')
+		// // 打開模態框
+		// $('.btnGenerateAllowance').click(function () {
+		// 	dialog.showModal() // 模態形式開啟對話框
+		// })
+		// // 關閉模態框
+		// $('#cancelDialog').click(function () {
+		// 	dialog.close() // 關閉模態框
+		// })
+		// // 攔截提交事件
+		// form.addEventListener('submit', (event) => {
+		// 	event.preventDefault() // 阻止表單的預設提交行為
+
+		// 	// 收集表單資料
+		// 	const formData = new FormData(form)
+		// 	const data = Object.fromEntries(formData.entries())
+
+		// 	console.log('表單內容:', data)
+		// 	dialog.close() // 提交後關閉對話框
+		// })
+		// $('#confirmDialog').click(function (e) {
+		// 	e.preventDefault();
+		// 	dialog.close() // 關閉模態框
+		// })
+		// 捕獲提交事件
+		// dialog.addEventListener('close', () => {
+		// 	console.log('模態框關閉了，返回值:', dialog.returnValue)
+		// })
+
 		// 暫時沒用到
 		// fieldDisplay(
 		// 	$('select[name="wc_woomp_ecpay_invoice_issue_mode"'),
