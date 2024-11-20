@@ -214,7 +214,13 @@ final class SunpayInvoiceHandler {
 			$invocie_time    = ( $invoice_date ) ? __( '<br>Invalid Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
 			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
 			$cancel_reason   = ( $invoice_date ) ? __( '<br>Cancel Reason: ', 'r2-sunpay-invoice' ) . $content : '';
-			$invoice_msg     = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $return_info['message'];
+			} else {
+				$invoice_msg = '';
+			}
 			$order->add_order_note( $invocie_result . $invocie_time . $invocie_number . $invoice_msg . $cancel_reason );
 
 			// 寫入發票回傳資訊
