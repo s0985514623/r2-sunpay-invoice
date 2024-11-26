@@ -132,31 +132,32 @@ final class WoocommerceSettingInvoice extends \WC_Settings_Page {
 						'desc_tip' => true,
 						'options'  => wc_get_order_statuses(),
 					],
-					[
-						'name'     => __( 'Invalid mode', 'r2-sunpay-invoice' ),
-						'type'     => 'select',
-						'desc'     => __( 'You can issue the e-invoice manually even if you choose Automatic mode' ),
-						'class'    => 'wc-enhanced-select',
-						'desc_tip' => true,
-						'id'       => 'wc_woomp_sunpay_invoice_invalid_mode',
-						'options'  => [
-							'manual' => __( 'Invalid manual', 'r2-sunpay-invoice' ),
-							'auto'   => __( 'Invalid automatic', 'r2-sunpay-invoice' ),
-						],
-						'default'  => 'auto',
-					],
-					[
-						'name'     => __( 'Allowed Order Status for invalid', 'r2-sunpay-invoice' ),
-						'type'     => 'select',
-						'class'    => 'wc-enhanced-select',
-						'desc'     => __( 'When order status changes to the status, the e-invoice will be invalid automatically.' ),
-						'id'       => 'wc_woomp_sunpay_invoice_invalid_at',
-						'desc_tip' => true,
-						'options'  => [
-							'wc-refunded' => __( 'Refunded', 'woocommerce' ),
-							'wc-failed'   => __( 'Failed', 'woocommerce' ),
-						],
-					],
+					// 取消自動作廢發票功能
+					// [
+					// 'name'     => __( 'Invalid mode', 'r2-sunpay-invoice' ),
+					// 'type'     => 'select',
+					// 'desc'     => __( 'You can issue the e-invoice manually even if you choose Automatic mode' ),
+					// 'class'    => 'wc-enhanced-select',
+					// 'desc_tip' => true,
+					// 'id'       => 'wc_woomp_sunpay_invoice_invalid_mode',
+					// 'options'  => [
+					// 'manual' => __( 'Invalid manual', 'r2-sunpay-invoice' ),
+					// 'auto'   => __( 'Invalid automatic', 'r2-sunpay-invoice' ),
+					// ],
+					// 'default'  => 'auto',
+					// ],
+					// [
+					// 'name'     => __( 'Allowed Order Status for invalid', 'r2-sunpay-invoice' ),
+					// 'type'     => 'select',
+					// 'class'    => 'wc-enhanced-select',
+					// 'desc'     => __( 'When order status changes to the status, the e-invoice will be invalid automatically.' ),
+					// 'id'       => 'wc_woomp_sunpay_invoice_invalid_at',
+					// 'desc_tip' => true,
+					// 'options'  => [
+					// 'wc-refunded' => __( 'Refunded', 'woocommerce' ),
+					// 'wc-failed'   => __( 'Failed', 'woocommerce' ),
+					// ],
+					// ],
 					[
 						'name'    => __( 'Carrier Type', 'r2-sunpay-invoice' ),
 						'desc'    => __( 'Allowed invoice carrier type', 'r2-sunpay-invoice' ),
