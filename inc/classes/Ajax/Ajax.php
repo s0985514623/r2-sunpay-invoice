@@ -165,10 +165,16 @@ final class Ajax {
 		$orders     =wc_get_orders($args);
 		$order_no   =[];
 		$invoice_no =[];
-		foreach ($orders as $order) {
-			$order_no[] = $order->get_order_number();
-			if (!empty($order->get_meta('_sunpay_invoice_number'))) {
-				$invoice_no[] = $order->get_meta('_sunpay_invoice_number');
+		if ($orders) {
+			foreach ($orders as $order) {
+				// 如果為退款訂單，則跳過
+				if ($order->get_type() === 'shop_order_refund') {
+					continue;
+				}
+				$order_no[] = $order->get_order_number();
+				if (!empty($order->get_meta('_sunpay_invoice_number'))) {
+					$invoice_no[] = $order->get_meta('_sunpay_invoice_number');
+				}
 			}
 		}
 

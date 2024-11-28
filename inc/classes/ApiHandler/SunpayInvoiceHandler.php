@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace J7\R2SunpayInvoice\ApiHandler;
 
-use const Avifinfo\UNDEFINED;
-
 if (class_exists('J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler')) {
 	return;
 }
@@ -38,7 +36,7 @@ final class SunpayInvoiceHandler {
 
 		$order_info   = $order->get_address();
 		$invoice_data = $order->get_meta( '_sunpay_invoice_data' );
-		$is_testmode  = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$is_testmode  = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
 		$is_b2b       = $invoice_data['_invoice_type'] === 'company';
 		$b2c_api_url  = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2c':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2c';
 		$b2b_api_url  = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2b':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceb2b';
@@ -108,7 +106,7 @@ final class SunpayInvoiceHandler {
 			// 2.寫入基本介接參數
 			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
 			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
-			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_options('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_option('wc_woomp_sunpay_invoice_hashkey');
 			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
 			$sunpay_invoice->api_url    = $invoice_data['_invoice_type'] === 'company'?$b2b_api_url:$b2c_api_url;
 
@@ -184,7 +182,7 @@ final class SunpayInvoiceHandler {
 		if ( '0' === $order_total ) {
 			return;
 		}
-		$is_testmode    = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$is_testmode    = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
 		$api_url        = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceInvalid':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateInvoiceInvalid';
 		$invoice_number = $order->get_meta( '_sunpay_invoice_number' );
 		try {
@@ -194,7 +192,7 @@ final class SunpayInvoiceHandler {
 			// 2.寫入基本介接參數
 			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
 			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
-			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_options('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_option('wc_woomp_sunpay_invoice_hashkey');
 			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
 			$sunpay_invoice->api_url    = $api_url;
 
@@ -214,7 +212,13 @@ final class SunpayInvoiceHandler {
 			$invocie_time    = ( $invoice_date ) ? __( '<br>Invalid Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
 			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
 			$cancel_reason   = ( $invoice_date ) ? __( '<br>Cancel Reason: ', 'r2-sunpay-invoice' ) . $content : '';
-			$invoice_msg     = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $return_info['message'];
+			} else {
+				$invoice_msg = '';
+			}
 			$order->add_order_note( $invocie_result . $invocie_time . $invocie_number . $invoice_msg . $cancel_reason );
 
 			// 寫入發票回傳資訊
@@ -240,7 +244,7 @@ final class SunpayInvoiceHandler {
 	 * return JSON
 	 */
 	public function get_invoice_list( $invoice_numbers = '', $order_no = '' ) {
-		$is_testmode = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' );
+		$is_testmode = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
 		$api_url     = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/GetInvoiceList':'https://inv.sunpay.com.tw/api/v1/SunPay/GetInvoiceList';
 		try {
 			// 1.載入SDK程式
@@ -249,7 +253,7 @@ final class SunpayInvoiceHandler {
 			// 2.寫入基本介接參數
 			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
 			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
-			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_options('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_option('wc_woomp_sunpay_invoice_hashkey');
 			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
 			$sunpay_invoice->api_url    = $api_url;
 

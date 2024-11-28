@@ -64,9 +64,10 @@ jQuery(function ($) {
 				$.unblockUI()
 				alert(response)
 				location.reload(true)
-			}).fail(function () {
+			}).fail(function (error) {
 				$.unblockUI()
 				alert('發票開立錯誤')
+				console.log("🚀 ~ error:", error)
 			})
 		})
 
@@ -88,9 +89,10 @@ jQuery(function ($) {
 						$.unblockUI()
 						alert(response)
 						location.reload(true)
-					}).fail(function () {
+					}).fail(function (error) {
 						$.unblockUI()
 						alert('發票作廢錯誤')
+						console.log("🚀 ~ error:", error)
 					})
 				}
 			}
