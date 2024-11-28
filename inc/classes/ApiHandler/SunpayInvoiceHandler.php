@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace J7\R2SunpayInvoice\ApiHandler;
 
-use const Avifinfo\UNDEFINED;
-
 if (class_exists('J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler')) {
 	return;
 }
