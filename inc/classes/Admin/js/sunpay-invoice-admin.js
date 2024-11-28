@@ -100,7 +100,7 @@ jQuery(function ($) {
 
 		// 折讓按鈕觸發
 		$('.btnGenerateAllowance').click(function () {
-			if (confirm('確定要開立此筆折讓發票')) {
+			if (confirm('確定要開立此筆折讓單')) {
 				$.blockUI({ message: '<p>處理中...</p>' })
 
 				var data = {

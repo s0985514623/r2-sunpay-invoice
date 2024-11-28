@@ -169,13 +169,13 @@ msgstr "紙本發票"
 msgid "Donated Organization"
 msgstr "捐贈單位"
 
-#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:145
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:143
 msgid "<b>Invoice issue result</b>"
 msgstr "<b>發票開立結果</b>"
 
-#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:145
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:143
 msgid "<b>Invoice issue faild</b>"
-msgstr "<b>發票開立結果</b>"
+msgstr "<b>發票開立失敗</b>"
 
 #: inc/classes/ApiHandler/SunpayInvoiceHandler.php:146
 msgid "<br>Generate Time: "
@@ -208,3 +208,23 @@ msgstr "<br>作廢時間: "
 #: inc/classes/ApiHandler/SunpayInvoiceHandler.php:209
 msgid "<br>Cancel Reason: "
 msgstr "<br>作廢原因: "
+
+#: inc/classes/Admin/OrderButton.php:219
+msgid "Invoice Allowance: "
+msgstr "折讓單號碼: "
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:374
+msgid "<b>Invalid Allowance result</b>"
+msgstr "<b>作廢折讓單結果</b>"
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:307
+msgid "<br>Allowance Number: "
+msgstr "<br>折讓單號碼: "
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:304
+msgid "<b>Allowance issue result</b>"
+msgstr "<b>開立折讓單結果</b>"
+
+#: inc/classes/ApiHandler/SunpayInvoiceHandler.php:308
+msgid "<br>Allowance Amount: "
+msgstr "<br>折讓金額: "

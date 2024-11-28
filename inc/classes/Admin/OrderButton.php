@@ -100,7 +100,7 @@ final class OrderButton {
 		if ( !empty($refunds) ) {
 			\add_meta_box(
 				'sunpay_allowance_meta_box',
-				__( '紅陽折讓發票', 'r2-sunpay-invoice' ),
+				__( '紅陽折讓單', 'r2-sunpay-invoice' ),
 				[ $this, 'allowance_meta_box' ],
 				'shop_order',
 				'side',
@@ -257,9 +257,9 @@ final class OrderButton {
 
 		// 產生按鈕，傳送 order id 給ajax js
 		if ( empty( $order->get_meta( '_sunpay_invoice_allowance' ) ) ) {
-			$output .= "<button class='button btnGenerateAllowance' type='button' value='" . $order_id . "'>開立折讓發票</button>";
+			$output .= "<button class='button btnGenerateAllowance' type='button' value='" . $order_id . "'>開立折讓單</button>";
 		} else {
-			$output .= "<button class='button btnInvalidAllowance' type='button' value='" . $order_id . "'>作廢折讓發票</button>";
+			$output .= "<button class='button btnInvalidAllowance' type='button' value='" . $order_id . "'>作廢折讓單</button>";
 		}
 
 		$output .= '</div>';
