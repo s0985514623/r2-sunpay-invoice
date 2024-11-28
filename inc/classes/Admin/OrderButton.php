@@ -24,7 +24,6 @@ final class OrderButton {
 		add_filter( 'manage_shop_order_posts_columns', [ $this, 'shop_order_columns' ], 11, 1 );
 		add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_column' ], 11, 2 );
 		add_action( 'add_meta_boxes', [ $this, 'add_metabox' ] );
-		// add_action( 'woocommerce_admin_order_data_after_order_details', [ $this,'set_dialog_modal' ] );
 	}
 
 	/**
@@ -90,14 +89,14 @@ final class OrderButton {
 			'side',
 			'high'
 		);
-		// \add_meta_box(
-		// 	'sunpay_allowance_meta_box',
-		// 	__( '紅陽折讓發票', 'r2-sunpay-invoice' ),
-		// 	[ $this, 'allowance_meta_box' ],
-		// 	'shop_order',
-		// 	'side',
-		// 	'high'
-		// );
+		\add_meta_box(
+			'sunpay_allowance_meta_box',
+			__( '紅陽折讓發票', 'r2-sunpay-invoice' ),
+			[ $this, 'allowance_meta_box' ],
+			'shop_order',
+			'side',
+			'high'
+		);
 	}
 	/**
 	 * Meta box callback
@@ -255,39 +254,5 @@ final class OrderButton {
 		$output .= '</div>';
 
 		return $output;
-	}
-	/**
-	 * 添加瀏覽器原生彈窗
-	 * 用於填寫折讓發票資料
-	 *
-	 * @param object $order 訂單物件
-	 * @return string
-	 */
-	public function set_dialog_modal( $order ) {
-		$order_id = $order->get_id();
-		// 開啟輸出緩衝
-		// ob_start();
-		// $html = '';
-		echo (
-			/*html */'
-			<dialog id="r2Dialog">
-				<h3>這是模態框</h3>
-				<form method="dialog" id="dialogForm">
-					<label>
-						商品名稱：
-						<input type="text" name="description" required>
-					</label><br>
-					<label>
-						商品數量：
-						<input type="email" name="quantity" required>
-					</label><br><br>
-					<button type="submit" id="confirmDialog">提交</button>
-					<button type="button" id="cancelDialog">取消</button>
-				</form>
-			</dialog>
-			'
-		);
-		// $html .= ob_get_clean();
-		// return $html;
 	}
 }
