@@ -67,7 +67,7 @@ jQuery(function ($) {
 			}).fail(function (error) {
 				$.unblockUI()
 				alert('發票開立錯誤')
-				console.log("🚀 ~ error:", error)
+				console.log('🚀 ~ error:', error)
 			})
 		})
 
@@ -92,7 +92,7 @@ jQuery(function ($) {
 					}).fail(function (error) {
 						$.unblockUI()
 						alert('發票作廢錯誤')
-						console.log("🚀 ~ error:", error)
+						console.log('🚀 ~ error:', error)
 					})
 				}
 			}
@@ -100,9 +100,53 @@ jQuery(function ($) {
 
 		// 折讓按鈕觸發
 		$('.btnGenerateAllowance').click(function () {
-			console.log('Allowance Btn Click')
-		})
+			if (confirm('確定要開立此筆折讓發票')) {
+				$.blockUI({ message: '<p>處理中...</p>' })
 
+				var data = {
+					action: 'allowance_invoice',
+					nonce: wpApiSettings.nonce,
+					orderId: $(this).val(),
+				}
+
+				$.post(ajaxurl, data, function (response) {
+					$.unblockUI()
+					alert(response)
+					location.reload(true)
+				}).fail(function (error) {
+					$.unblockUI()
+					alert('發票作廢錯誤')
+					console.log('🚀 ~ error:', error)
+				})
+			}
+		})
+		// 作廢折讓按鈕觸發
+		$('.btnInvalidAllowance').click(function () {
+			if (confirm('確定要刪除此筆發票')) {
+				//增加使用者輸入作廢原因
+				const userInput = window.prompt('請輸入作廢原因(字數限制20字)：')
+				if (userInput.length !== null) {
+					$.blockUI({ message: '<p>處理中...</p>' })
+
+					var data = {
+						action: 'invalid_allowance',
+						nonce: wpApiSettings.nonce,
+						orderId: $(this).val(),
+						content: userInput,
+					}
+
+					$.post(ajaxurl, data, function (response) {
+						$.unblockUI()
+						alert(response)
+						location.reload(true)
+					}).fail(function (error) {
+						$.unblockUI()
+						alert('發票作廢錯誤')
+						console.log('🚀 ~ error:', error)
+					})
+				}
+			}
+		})
 
 		// 暫時沒用到
 		// fieldDisplay(

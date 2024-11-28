@@ -234,8 +234,8 @@ if (! class_exists( 'J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceSDK' ) ) {
 		 * message:string,
 		 * result:array{
 		 * merchantID:string,
-		 * invoiceNumber":string,
-		 * cancelDateTime":string,
+		 * invoiceNumber:string,
+		 * cancelDateTime:string,
 		 * }
 		 * } 發票回傳資訊
 		 */
@@ -258,7 +258,39 @@ if (! class_exists( 'J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceSDK' ) ) {
 				return $data;
 			}
 		}
-
+		/**
+		 * 折讓發票function
+		 *
+		 * @return array{
+		 * status:string,
+		 * message:string,
+		 * result:array{
+		 * merchantID:string,
+		 * invoiceNumber:string,
+		 * allowanceNumber:string,
+		 * allowanceDate:DateTime
+		 * totalAmount:Decimal,
+		 * }
+		 */
+		public function allowance_invoice() {
+			$time_stamp               = time()+( 8*3600 );// 台灣時區
+			$data                     = [
+				'CompanyID' => $this->CompanyID,
+				'TimeStamp' => (string) $time_stamp,
+			];
+			$this->send['Token']      = $this->aes_encrypt( json_encode( $data ), $this->HashKey, $this->HashIV );
+			$this->send['MerchantID'] = $this->merchantID;
+			$response                 = $this->send();
+			if ( is_wp_error( $response ) ) {
+				$error_message = $response->get_error_message();
+				return "Something went wrong: $error_message";
+			} else {
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				// 處理 $data 變量
+				return $data;
+			}
+		}
 		/**
 		 * 取得發票列表function
 		 *

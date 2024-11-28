@@ -34,13 +34,15 @@ final class Ajax {
 		add_action( 'wp_ajax_invalid_invoice', [ $this, 'invalid_invoice' ] );
 		add_action( 'wp_ajax_get_invoice_list', [ $this, 'get_invoice_list' ] );
 		add_action( 'wp_ajax_get_orders_list', [ $this, 'get_orders_list' ] );
+		add_action( 'wp_ajax_allowance_invoice', [ $this, 'allowance_invoice' ] );
+		add_action( 'wp_ajax_invalid_allowance', [ $this, 'invalid_allowance' ] );
 		$this->invoice_handler = SunpayInvoiceHandler::instance();
 	}
 
 	/**
 	 * Generate Invoice
 	 *
-	 * @return void
+	 * @return void | string
 	 */
 	public function generate_invoice() {
 		// Security check
@@ -70,7 +72,7 @@ final class Ajax {
 	/**
 	 * Invalid Invoice
 	 *
-	 * @return void
+	 * @return void | string
 	 */
 	public function invalid_invoice() {
 		// Security check
@@ -82,9 +84,40 @@ final class Ajax {
 			// $msg = $content;
 			echo $msg;
 		}
-		// $order = wc_get_order( $order_id );
-		// $order->update_meta_data( '_sunpay_invoice_status', '0' );
-		// $order->save();
+		wp_die();
+	}
+	/**
+	 * Allowance Invoice
+	 *
+	 * @return void | string
+	 */
+	public function allowance_invoice() {
+		// Security check
+		\check_ajax_referer(Plugin::$kebab, 'nonce');
+
+		$order_id = isset($_POST['orderId'])?intval( sanitize_text_field( wp_unslash($_POST['orderId']) ) ):'';
+		if ( ! empty( $order_id ) ) {
+			// $msg = 'test';
+			$msg = $this->invoice_handler->allowance_invoice( $order_id );
+			echo $msg;
+		}
+		wp_die();
+	}
+	/**
+	 * Invalid Invoice
+	 *
+	 * @return void | string
+	 */
+	public function invalid_allowance() {
+		// Security check
+		\check_ajax_referer(Plugin::$kebab, 'nonce');
+		$order_id = isset($_POST['orderId'])?intval( sanitize_text_field( wp_unslash($_POST['orderId']) ) ):'';
+		$content  = isset($_POST['content'])?sanitize_text_field( wp_unslash($_POST['content']) ):'';
+		if ( ! empty( $order_id ) ) {
+			$msg = $this->invoice_handler->invalid_allowance( $order_id, $content );
+			// $msg = $content;
+			echo $msg;
+		}
 		wp_die();
 	}
 	/**
@@ -127,24 +160,6 @@ final class Ajax {
 		];
 		\wp_send_json($return);
 		\wp_die();
-
-		// $invoice_list = $this->invoice_handler->get_invoice_list( $invoice_numbers, '3670' );
-
-		// if (400 === $invoice_list['status']) {
-		// $return = [
-		// 'message' => 'error',
-		// 'data'    => $invoice_list,
-		// ];
-		// \wp_send_json($return);
-		// \wp_die();
-		// } else {
-		// $return = [
-		// 'message' => 'success',
-		// 'data'    => $invoice_list,
-		// ];
-		// \wp_send_json($return);
-		// \wp_die();
-		// }
 	}
 	/**
 	 * Get OrderNo And InvoiceNo From DateRange

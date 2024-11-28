@@ -81,6 +81,11 @@ final class OrderButton {
 	 * @return void
 	 */
 	public function add_metabox(): void {
+		/*phpcs:ignore*/
+		$order = wc_get_order( $_GET['post'] );
+		if ( ! $order ) {
+			return;
+		}
 		\add_meta_box(
 			'sunpay_invoice_meta_box',
 			__( '紅陽電子發票', 'r2-sunpay-invoice' ),
@@ -89,14 +94,20 @@ final class OrderButton {
 			'side',
 			'high'
 		);
-		\add_meta_box(
-			'sunpay_allowance_meta_box',
-			__( '紅陽折讓發票', 'r2-sunpay-invoice' ),
-			[ $this, 'allowance_meta_box' ],
-			'shop_order',
-			'side',
-			'high'
-		);
+
+		// 如果該筆訂單非退款訂單，則不顯示折讓發票按鈕
+		$refunds = $order->get_refunds();
+		if ( !empty($refunds) ) {
+			\add_meta_box(
+				'sunpay_allowance_meta_box',
+				__( '紅陽折讓發票', 'r2-sunpay-invoice' ),
+				[ $this, 'allowance_meta_box' ],
+				'shop_order',
+				'side',
+				'high'
+			);
+		}
+
 	}
 	/**
 	 * Meta box callback

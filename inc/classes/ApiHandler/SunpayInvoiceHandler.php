@@ -137,12 +137,12 @@ final class SunpayInvoiceHandler {
 			$return_info = $sunpay_invoice->invoice_send();
 
 			// 於備註區寫入發票資訊
-			$invoice_date    =$return_info['result']['crT_DAT'];
-			$invoice_number  =$return_info['result']['invoiceNumber'];
-			$invoice_message =$return_info['status'];
-			$invocie_result  = ( $invoice_date ) ? __( '<b>Invoice issue result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invoice issue faild</b>', 'r2-sunpay-invoice' );
-			$invocie_time    = ( $invoice_date ) ? __( '<br>Generate Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
-			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
+			$invoice_date       =$return_info['result']['crT_DAT'];
+			$invoice_number     =$return_info['result']['invoiceNumber'];
+			$invoice_message    =$return_info['status'];
+			$invoice_result     = ( $invoice_date ) ? __( '<b>Invoice issue result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invoice issue faild</b>', 'r2-sunpay-invoice' );
+			$invoice_time       = ( $invoice_date ) ? __( '<br>Generate Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
+			$invoice_number_msg = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
 			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
 				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
 			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
@@ -151,7 +151,7 @@ final class SunpayInvoiceHandler {
 				$invoice_msg = '';
 			}
 
-			$order->add_order_note( $invocie_result . $invocie_time . $invocie_number . $invoice_msg );
+			$order->add_order_note( $invoice_result . $invoice_time . $invoice_number_msg . $invoice_msg );
 
 			// 寫入發票回傳資訊
 			if ( isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
@@ -205,13 +205,13 @@ final class SunpayInvoiceHandler {
 			$return_info = $sunpay_invoice->invoice_invalid();
 
 			// 於備註區寫入發票資訊
-			$invoice_date    =$return_info['result']['cancelDateTime'];
-			$invoice_number  =$return_info['result']['invoiceNumber'];
-			$invoice_message =$return_info['status'];
-			$invocie_result  = ( $invoice_date ) ? __( '<b>Invalid invoice result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invalid issue faild</b>', 'r2-sunpay-invoice' );
-			$invocie_time    = ( $invoice_date ) ? __( '<br>Invalid Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
-			$invocie_number  = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
-			$cancel_reason   = ( $invoice_date ) ? __( '<br>Cancel Reason: ', 'r2-sunpay-invoice' ) . $content : '';
+			$invoice_date       =$return_info['result']['cancelDateTime'];
+			$invoice_number     =$return_info['result']['invoiceNumber'];
+			$invoice_message    =$return_info['status'];
+			$invoice_result     = ( $invoice_date ) ? __( '<b>Invalid invoice result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invalid issue faild</b>', 'r2-sunpay-invoice' );
+			$invoice_time       = ( $invoice_date ) ? __( '<br>Invalid Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
+			$invoice_number_msg = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
+			$cancel_reason      = ( $invoice_date ) ? __( '<br>Cancel Reason: ', 'r2-sunpay-invoice' ) . $content : '';
 			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
 				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
 			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
@@ -219,7 +219,7 @@ final class SunpayInvoiceHandler {
 			} else {
 				$invoice_msg = '';
 			}
-			$order->add_order_note( $invocie_result . $invocie_time . $invocie_number . $invoice_msg . $cancel_reason );
+			$order->add_order_note( $invoice_result . $invoice_time . $invoice_number_msg . $invoice_msg . $cancel_reason );
 
 			// 寫入發票回傳資訊
 			if ( isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
@@ -227,6 +227,169 @@ final class SunpayInvoiceHandler {
 				$order->update_meta_data( '_sunpay_invoice_status', 0 );
 				// 清除發票號碼
 				$order->update_meta_data( '_sunpay_invoice_number', '');
+				$order->save();
+			}
+			return $invoice_message;
+		} catch (\Exception $e) {
+			// 例外錯誤處理.
+			return new \WP_Error( 'error', $e->getMessage() );
+		}
+	}
+	/**
+	 * 開立折讓發票
+	 *
+	 * @param int $order_id 訂單ID
+	 *
+	 * return string
+	 */
+	public function allowance_invoice( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if (!$order) {
+			return;
+		}
+		/** @var \WC_Order $order */
+		$order_total = $order->get_total();
+
+		if ( '0' === \strval($order_total) ) {
+			return;
+		}
+		$is_testmode    = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
+		$api_url        = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/Createallowance':'https://inv.sunpay.com.tw/api/v1/SunPay/Createallowance';
+		$invoice_number = $order->get_meta( '_sunpay_invoice_number' );
+		$buyer_email    = $order->get_billing_email();
+		// 退貨商品資料及稅率資料
+		$refunds        = $order->get_refunds();
+		$refunded_items =[];
+		foreach ($refunds as $refund) {
+			// 獲取退貨商品資料
+			$items = $refund->get_items();
+			foreach ($items as $item) {
+				$refunded_items[] = [
+					'description' => $item->get_name(),
+					'quantity'    => abs($item->get_quantity()),
+					'unitPrice'   => $order->get_item_subtotal( $item, false ), // 取得不含稅價格
+					'amount'      => abs(round( (float) $item->get_subtotal(), 0)),
+					'Tax'         => abs(round( (float) $item->get_total_tax(), 0)),
+					'taxType'     => $item->get_tax_status() ==='none' ? 3 : 1,
+				];
+			}
+		}
+		try {
+			// 1.載入SDK程式
+			$sunpay_invoice = new SunpayInvoiceSDK();
+
+			// 2.寫入基本介接參數
+			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
+			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_option('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
+			$sunpay_invoice->api_url    = $api_url;
+
+			// 3.寫入發票資訊
+			$sunpay_invoice->send                  =[];// 清空send中的資料
+			$sunpay_invoice->send['invoiceNumber'] = $invoice_number;
+			$sunpay_invoice->send['orderNo']       = (string) $order_id;
+			$sunpay_invoice->send['remindEmail']   = $buyer_email;
+			$sunpay_invoice->send['productItems']  = $refunded_items;
+
+			// 4.送出
+			$return_info = $sunpay_invoice->invoice_send();
+
+			// 於備註區寫入發票資訊
+			$invoice_date         =$return_info['result']['allowanceDate'];
+			$invoice_number       =$return_info['result']['invoiceNumber'];
+			$allowance_number     =$return_info['result']['allowanceNumber'];
+			$total_amount         =$return_info['result']['totalAmount'];
+			$invoice_message      =$return_info['status'];
+			$invoice_result       = ( $invoice_date ) ? __( '<b>Allowance issue result</b>', 'r2-sunpay-invoice' ) : __( '<b>Allowance issue faild</b>', 'r2-sunpay-invoice' );
+			$invoice_time         = ( $invoice_date ) ? __( '<br>Generate Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
+			$invoice_number_msg   = ( $invoice_date ) ? __( '<br>Invoice Number: ', 'r2-sunpay-invoice' ) . $invoice_number : '';
+			$allowance_number_msg = ( $invoice_date ) ? __( '<br>Allowance Number: ', 'r2-sunpay-invoice' ) . $allowance_number : '';
+			$total_amount         = ( $invoice_date ) ? __( '<br>Allowance Amount: ', 'r2-sunpay-invoice' ) . $total_amount : '';
+			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $return_info['message'];
+			} else {
+				$invoice_msg = '';
+			}
+
+			$order->add_order_note( $invoice_result . $invoice_time . $invoice_number_msg . $allowance_number_msg . $total_amount . $invoice_msg );
+
+			// 寫入發票回傳資訊
+			if ( isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				// 異動已經開立發票的狀態 1.已經開立 0.尚未開立
+				$order->update_meta_data( '_sunpay_invoice_allowance_status', 1 );
+				// 寫入發票號碼
+				$order->update_meta_data( '_sunpay_invoice_allowance', $allowance_number);
+				$order->save();
+			}
+			return $invoice_message;
+		} catch (\Exception $e) {
+			// 例外錯誤處理.
+			return new \WP_Error( 'error', $e->getMessage() );
+		}
+	}
+	/**
+	 * 作廢折讓發票
+	 *
+	 * @param int    $order_id 訂單ID
+	 * @param string $content 作廢原因
+	 *
+	 * return string
+	 */
+	public function invalid_allowance( $order_id, $content ) {
+		$order       = wc_get_order( $order_id );
+		$order_total = $order->get_total();
+
+		if ( '0' === $order_total ) {
+			return;
+		}
+		$is_testmode      = get_option( 'wc_woomp_sunpay_invoice_testmode_enabled' )==='yes';
+		$api_url          = $is_testmode?'https://testinv.sunpay.com.tw/api/v1/SunPay/CreateallowanceInvalid':'https://inv.sunpay.com.tw/api/v1/SunPay/CreateallowanceInvalid';
+		$allowance_number = $order->get_meta( '_sunpay_invoice_allowance' );
+		try {
+			// 1.載入SDK程式
+			$sunpay_invoice = new SunpayInvoiceSDK();
+
+			// 2.寫入基本介接參數
+			$sunpay_invoice->CompanyID  = get_option('wc_woomp_sunpay_invoice_company_id');
+			$sunpay_invoice->merchantID = $is_testmode?'14F8CK87XB':get_option('wc_woomp_sunpay_invoice_merchant_id');
+			$sunpay_invoice->HashKey    = $is_testmode?'WF09QRGVZX6R20HS':get_option('wc_woomp_sunpay_invoice_hashkey');
+			$sunpay_invoice->HashIV     = $is_testmode?'UBAMHYLNSYY7P0U4':get_option('wc_woomp_sunpay_invoice_hashiv');
+			$sunpay_invoice->api_url    = $api_url;
+
+			// 3.寫入發票資訊
+			$sunpay_invoice->send                    =[];// 清空send中的資料
+			$sunpay_invoice->send['allowanceNumber'] = $allowance_number;
+			$sunpay_invoice->send['cancelReason']    = $content;
+
+			// 4.送出
+			$return_info = $sunpay_invoice->invoice_invalid();
+
+			// 於備註區寫入發票資訊
+			$invoice_date         =$return_info['result']['allowanceDate'];
+			$allowance_number     =$return_info['result']['allowanceNumber'];
+			$invoice_message      =$return_info['status'];
+			$invoice_result       = ( $invoice_date ) ? __( '<b>Invalid Allowance result</b>', 'r2-sunpay-invoice' ) : __( '<b>Invalid issue faild</b>', 'r2-sunpay-invoice' );
+			$invoice_time         = ( $invoice_date ) ? __( '<br>Invalid Time: ', 'r2-sunpay-invoice' ) . $invoice_date : '';
+			$allowance_number_msg = ( $invoice_date ) ? __( '<br>Allowance Number: ', 'r2-sunpay-invoice' ) . $allowance_number : '';
+			$cancel_reason        = ( $invoice_date ) ? __( '<br>Cancel Reason: ', 'r2-sunpay-invoice' ) . $content : '';
+			if (isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $invoice_message;
+			} elseif (isset( $return_info['status'] ) && $return_info['status'] === 'ERROR' ) {
+				$invoice_msg = __( '<br>Invoice Message: ', 'r2-sunpay-invoice' ) . $return_info['message'];
+			} else {
+				$invoice_msg = '';
+			}
+			$order->add_order_note( $invoice_result . $invoice_time . $allowance_number_msg . $invoice_msg . $cancel_reason );
+
+			// 寫入發票回傳資訊
+			if ( isset( $return_info['status'] ) && $return_info['status'] === 'SUCCESS' ) {
+				// 異動已經開立發票的狀態 1.已經開立 0.尚未開立
+				$order->update_meta_data( '_sunpay_invoice_allowance_status', 0 );
+				// 清除發票號碼
+				$order->update_meta_data( '_sunpay_invoice_allowance', '');
 				$order->save();
 			}
 			return $invoice_message;
