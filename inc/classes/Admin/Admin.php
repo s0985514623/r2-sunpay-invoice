@@ -72,7 +72,7 @@ final class Admin {
 		// 成功退刷會返回E0
 		if ( $response === 'E0' ) {
 			$order->add_order_note(
-				'信用卡退刷成功'
+				'信用卡退刷申請成功'
 			);
 		} elseif ( is_wp_error( $response )) {
 			// 取得錯誤訊息
