@@ -23,11 +23,8 @@ if (\class_exists('J7\R2SunpayInvoice\Plugin')) {
 	return;
 }
 
-// require_once __DIR__ . '/vendor/autoload_packages.php';
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor-prefixed/autoload.php';
-// use R2SunpayInvoice\vendorJ7\WpUtils\Traits\PluginTrait;
-// use R2SunpayInvoice\vendorJ7\WpUtils\Traits\SingletonTrait;
 /**
  * Class Plugin
  */
