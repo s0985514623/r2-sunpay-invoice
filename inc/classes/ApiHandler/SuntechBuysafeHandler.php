@@ -19,7 +19,7 @@ if (class_exists('J7\R2SunpayInvoice\ApiHandler\SuntechBuysafeHandler')) {
  * Class SuntechBuysafeHandler
  */
 final class SuntechBuysafeHandler {
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Refund class

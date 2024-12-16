@@ -18,7 +18,7 @@ if (class_exists('J7\R2SunpayInvoice\Admin\Admin')) {
  * Class Entry
  */
 final class Admin {
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor

@@ -19,7 +19,7 @@ if (class_exists('J7\R2SunpayInvoice\FrontEnd\InvoiceList')) {
  * Class Entry
  */
 final class InvoiceList {
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor

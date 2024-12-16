@@ -23,15 +23,18 @@ if (\class_exists('J7\R2SunpayInvoice\Plugin')) {
 	return;
 }
 
+// require_once __DIR__ . '/vendor/autoload_packages.php';
 require_once __DIR__ . '/vendor/autoload.php';
-
+require_once __DIR__ . '/vendor-prefixed/autoload.php';
+// use R2SunpayInvoice\vendorJ7\WpUtils\Traits\PluginTrait;
+// use R2SunpayInvoice\vendorJ7\WpUtils\Traits\SingletonTrait;
 /**
  * Class Plugin
  */
 final class Plugin {
 
-	use \J7\WpUtils\Traits\PluginTrait;
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\PluginTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor
@@ -54,7 +57,10 @@ final class Plugin {
 				'callback'    => [ Bootstrap::class, 'instance' ],
 			]
 		);
+
+		// $this->logUsage();
 	}
 }
 
 Plugin::instance();
+// Plugin::getUsageLog();

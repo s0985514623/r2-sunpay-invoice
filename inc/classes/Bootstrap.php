@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace J7\R2SunpayInvoice;
 
 use J7\R2SunpayInvoice\Utils\Base;
-use Kucrut\Vite;
+use R2SunpayInvoice\vendor\Kucrut\Vite;
 
 if (class_exists('J7\R2SunpayInvoice\Bootstrap')) {
 	return;
@@ -18,7 +18,7 @@ if (class_exists('J7\R2SunpayInvoice\Bootstrap')) {
  */
 final class Bootstrap {
 
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor

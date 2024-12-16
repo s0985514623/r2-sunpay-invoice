@@ -18,7 +18,7 @@ if (class_exists('J7\R2SunpayInvoice\Ajax\Ajax')) {
  * Class Ajax
  */
 final class Ajax {
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Invoice Handler

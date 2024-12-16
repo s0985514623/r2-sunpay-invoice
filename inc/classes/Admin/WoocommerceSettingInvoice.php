@@ -15,7 +15,7 @@ if (class_exists('J7\R2SunpayInvoice\Admin\WoocommerceSettingInvoice')) {
  * Class Woomp_Setting_Invoice
  */
 final class WoocommerceSettingInvoice extends \WC_Settings_Page {
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * @var array<mixed> $setting_default

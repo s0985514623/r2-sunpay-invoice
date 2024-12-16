@@ -17,7 +17,7 @@ if (class_exists('J7\R2SunpayInvoice\ApiHandler\SunpayInvoiceHandler')) {
  * Class SunpayInvoiceHandler
  */
 final class SunpayInvoiceHandler {
-	use \J7\WpUtils\Traits\SingletonTrait;
+	use \R2SunpayInvoice\vendor\J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * 開立發票

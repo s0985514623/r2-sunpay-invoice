@@ -19,7 +19,8 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"J7\\R2SunpayInvoice\\": "inc/classes/"
+			"J7\\R2SunpayInvoice\\": "inc/classes/",
+			"R2SunpayInvoice\\vendor\\": "vendor-prefixed/"
 		}
 	},
 	"config": {
@@ -30,7 +31,8 @@
 	},
 	"require": {
 		"kucrut/vite-for-wp": "^0.8.0",
-		"j7-dev/wp-utils": "0.2.27"
+		"j7-dev/wp-plugin-trait": "0.1.3",
+		"j7-dev/wp-utils": "0.2.57"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "@stable",
@@ -40,9 +42,36 @@
 		"phpstan/phpstan": "^1.11.9",
 		"php-stubs/woocommerce-stubs": "^9.1",
 		"php-stubs/wordpress-stubs": "^6.6",
-		"phpstan/extension-installer": "^1.4.1"
+		"phpstan/extension-installer": "^1.4.1",
+		"brianhenryie/strauss": "^0.20.1"
 	},
 	"scripts": {
-		"lint": "phpcs"
+		"lint": "phpcs",
+		"prefix-namespaces": [
+			"strauss",
+			"@php composer dump-autoload"
+		],
+		"post-install-cmd": [
+			"@prefix-namespaces"
+		],
+		"post-update-cmd": [
+			"@prefix-namespaces"
+		]
+	},
+	"extra": {
+		"strauss": {
+			"target_directory": "vendor-prefixed",
+			"namespace_prefix": "R2SunpayInvoice\\vendor\\",
+			"classmap_prefix": "R2SunpayInvoice_vendor_",
+			"constant_prefix": "R2V_",
+			"classmap_output": true,
+			"update_call_sites": true,
+			"exclude_from_copy": {
+				"packages": [
+					"yahnis-elsts/plugin-update-checker",
+					"j7-dev/tgm-plugin-activation-forked"
+				]
+			}
+		}
 	}
 }
