@@ -3,7 +3,7 @@
  * Plugin Name:       R2 Sunpay Invoice
  * Plugin URI:        https://github.com/s0985514623/r2-sunpay-invoice
  * Description:       紅陽科技發票串接
- * Version:           1.0.12
+ * Version:           1.0.13
  * Requires at least: 5.7
  * Requires PHP:      8.0
  * Author:            Ren
