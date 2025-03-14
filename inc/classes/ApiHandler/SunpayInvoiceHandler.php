@@ -76,7 +76,7 @@ final class SunpayInvoiceHandler {
 				'description' => $item->get_name(),
 				'quantity'    => $item->get_quantity(),
 				'unitPrice'   => $order->get_item_subtotal( $item, false ), // 取得不含稅價格
-				'amount'      => round( (float) $item->get_subtotal(), 0),
+				'amount'      => $item->get_quantity() * $order->get_item_subtotal( $item, false ),
 				'taxType'     => $item->get_tax_status() ==='none' ? 3 : 1,
 			];
 			// 若有免稅商品，則更改為混稅，並加總免稅銷售額
@@ -99,6 +99,18 @@ final class SunpayInvoiceHandler {
 			];
 			$sales_amount   += round( (float) $shipping_excl_tax, 0);
 		}
+		// 如果有使用折價券，將折價券項目加入商品資料
+		$coupon_code = $order->get_coupon_codes();
+		if ( !empty($coupon_code) ) {
+			$product_items[] = [
+				'description' => '折價券',
+				'quantity'    => 1,
+				'unitPrice'   => - $order->get_total_discount(),
+				'amount'      => - round( (float) $order->get_total_discount(), 0),
+				'taxType'     => 1,
+			];
+			$sales_amount   -= round( (float) $order->get_total_discount(), 0);
+		}
 		try {
 			// 1.載入SDK程式
 			$sunpay_invoice = new SunpayInvoiceSDK();
@@ -111,7 +123,7 @@ final class SunpayInvoiceHandler {
 			$sunpay_invoice->api_url    = $invoice_data['_invoice_type'] === 'company'?$b2b_api_url:$b2c_api_url;
 
 			// 3.寫入發票資訊
-			$sunpay_invoice->send['orderNo']              = (string) $order_id;
+			$sunpay_invoice->send['orderNo']              = (string) ( $order_id . '_' . wp_date('Y-m-d H:i:s') );
 			$sunpay_invoice->send['buyerIdentifier']      = $buyer_identifier;
 			$sunpay_invoice->send['buyerName']            = $buyer_name;
 			$sunpay_invoice->send['buyerEmailAddress']    = $buyer_email;
